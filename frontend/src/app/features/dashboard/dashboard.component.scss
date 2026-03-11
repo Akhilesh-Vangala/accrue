@@ -1,0 +1,7 @@
+.bar-track { height: 10px; background: #eef3f1; border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 99px; }
+.chart { width: 100%; height: 190px; display: block; }
+.chart text { font-size: 10px; fill: #6b7a74; }
+.legend-dot { display: inline-block; width: 10px; height: 10px; border-radius: 3px; margin-right: .35rem; }
+a.kpi-link { color: inherit; text-decoration: none; }
+a.kpi-link:hover .card { border-color: #9fdcc6; }

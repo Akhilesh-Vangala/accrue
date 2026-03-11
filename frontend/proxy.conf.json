@@ -1,0 +1,5 @@
+{
+  "/api": { "target": "http://localhost:5076", "secure": false },
+  "/hangfire": { "target": "http://localhost:5076", "secure": false },
+  "/health": { "target": "http://localhost:5076", "secure": false }
+}

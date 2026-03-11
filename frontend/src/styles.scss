@@ -1,0 +1,141 @@
+// Brand palette: deep ink sidebar, emerald accent, quiet neutrals for dense financial tables.
+$primary: #0b7d5e;
+$success: #16a34a;
+$danger: #dc2626;
+$warning: #d97706;
+$info: #0284c7;
+$body-bg: #f5f7f6;
+$body-color: #1d2a25;
+$border-radius: .5rem;
+$border-radius-lg: .75rem;
+$font-family-sans-serif: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+$font-size-base: .9375rem;
+$table-cell-padding-y: .65rem;
+$table-cell-padding-x: .75rem;
+$card-border-color: #e3e9e6;
+$enable-shadows: false;
+
+@import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root {
+  --lf-ink: #0c1a15;
+  --lf-ink-2: #12251e;
+  --lf-mint: #34d399;
+  --lf-muted: #6b7a74;
+  --lf-line: #e3e9e6;
+}
+
+body {
+  font-feature-settings: "tnum" 1, "cv11" 1;
+}
+
+.num {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.text-muted-2 {
+  color: var(--lf-muted) !important;
+}
+
+.page-title {
+  font-size: 1.4rem;
+  font-weight: 650;
+  letter-spacing: -.01em;
+  margin: 0;
+}
+
+.page-head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.card {
+  border-color: var(--lf-line);
+  box-shadow: 0 1px 2px rgba(12, 26, 21, .04);
+}
+
+.card-header {
+  background: transparent;
+  border-bottom-color: var(--lf-line);
+  font-weight: 600;
+}
+
+.table {
+  --bs-table-hover-bg: #f1f6f4;
+  margin-bottom: 0;
+
+  thead th {
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--lf-muted);
+    font-weight: 600;
+    border-bottom-width: 1px;
+    white-space: nowrap;
+  }
+}
+
+.table-clickable tbody tr {
+  cursor: pointer;
+}
+
+.kpi {
+  .kpi-label {
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--lf-muted);
+    font-weight: 600;
+  }
+
+  .kpi-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .kpi-sub {
+    font-size: .8rem;
+    color: var(--lf-muted);
+  }
+}
+
+.badge-status {
+  font-weight: 600;
+  font-size: .72rem;
+  padding: .35em .6em;
+  border-radius: 999px;
+}
+
+.form-label {
+  font-weight: 500;
+  font-size: .85rem;
+}
+
+.empty {
+  padding: 2.5rem 1rem;
+  text-align: center;
+  color: var(--lf-muted);
+}
+
+.btn {
+  font-weight: 500;
+}
+
+.toast-stack {
+  position: fixed;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1090;
+  display: grid;
+  gap: .5rem;
+  width: min(380px, calc(100vw - 2rem));
+}

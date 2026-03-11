@@ -1,0 +1,59 @@
+<div class="page-head">
+  <div>
+    <a class="small text-decoration-none" routerLink="/payment-runs"><i class="bi bi-arrow-left"></i> Payment runs</a>
+    <h1 class="page-title">New payment run</h1>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Approved invoices not yet scheduled</span>
+        <button class="btn btn-sm btn-outline-secondary" (click)="selectDueWithin(10)">Select due within 10 days</button>
+      </div>
+      @if (eligible(); as list) {
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead><tr>
+              <th style="width:36px"><input class="form-check-input" type="checkbox" [checked]="allSelected()" (change)="toggleAll()" aria-label="Select all" /></th>
+              <th>Invoice</th><th>Vendor</th><th>Due</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              @for (i of list; track i.id) {
+                <tr (click)="toggle(i.id)" style="cursor:pointer">
+                  <td><input class="form-check-input" type="checkbox" [checked]="selected().has(i.id)" (click)="$event.stopPropagation()" (change)="toggle(i.id)" [attr.aria-label]="'Select ' + i.invoiceNumber" /></td>
+                  <td class="fw-semibold">{{ i.invoiceNumber }}</td>
+                  <td>{{ i.vendorName }}</td>
+                  <td [class.text-danger]="i.isOverdue">{{ i.dueDate | date: 'MMM d, y' }}</td>
+                  <td class="num">{{ i.outstanding | currency: 'USD' }}</td>
+                </tr>
+              } @empty {
+                <tr><td colspan="5" class="empty">No approved invoices are waiting for payment.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <lf-loading />
+      }
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card position-sticky" style="top:80px">
+      <div class="card-body">
+        <div class="mb-3">
+          <label class="form-label" for="runName">Run name</label>
+          <input id="runName" class="form-control" [(ngModel)]="name" />
+        </div>
+        <div class="mb-3">
+          <label class="form-label" for="payDate">Payment date</label>
+          <input id="payDate" type="date" class="form-control" [(ngModel)]="paymentDate" [min]="today" />
+        </div>
+        <div class="d-flex justify-content-between"><span class="text-muted-2">Invoices</span><span>{{ selected().size }}</span></div>
+        <div class="d-flex justify-content-between fs-5 fw-bold"><span>Total</span><span class="num">{{ selectedTotal() | currency: 'USD' }}</span></div>
+      </div>
+      <div class="card-footer bg-white d-grid">
+        <button class="btn btn-primary" [disabled]="busy() || selected().size === 0 || !name.trim()" (click)="create()">Create draft run</button>
+      </div>
+    </div>
+  </div>
+</div>

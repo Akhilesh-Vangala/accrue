@@ -1,0 +1,109 @@
+<div class="page-head">
+  <div>
+    <a class="small text-decoration-none" routerLink="/invoices"><i class="bi bi-arrow-left"></i> Invoices</a>
+    <h1 class="page-title">{{ isEdit() ? 'Edit invoice' : 'New invoice' }}</h1>
+  </div>
+</div>
+
+@if (loading()) {
+  <lf-loading />
+} @else {
+  <form [formGroup]="form" (ngSubmit)="save(false)" novalidate>
+    @if (error()) {
+      <div class="alert alert-danger">{{ error() }}</div>
+    }
+
+    <div class="row g-3">
+      <div class="col-lg-8">
+        <div class="card mb-3">
+          <div class="card-header">Invoice details</div>
+          <div class="card-body row g-3">
+            <div class="col-md-6">
+              <label class="form-label" for="vendor">Vendor</label>
+              <select id="vendor" class="form-select" formControlName="vendorId" [class.is-invalid]="invalid('vendorId')">
+                <option [ngValue]="0" disabled>Select a vendor</option>
+                @for (v of vendors(); track v.id) {
+                  <option [ngValue]="v.id">{{ v.name }}</option>
+                }
+              </select>
+              @if (selectedVendor(); as v) {
+                <div class="form-text">{{ v.category }} · Net {{ v.paymentTermsDays }}</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="number">Vendor invoice #</label>
+              <input id="number" class="form-control" formControlName="invoiceNumber"
+                     [class.is-invalid]="invalid('invoiceNumber') || errors()['invoiceNumber']" />
+              <div class="form-text">Duplicates for the same vendor are blocked.</div>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="date">Invoice date</label>
+              <input id="date" type="date" class="form-control" formControlName="invoiceDate"
+                     [class.is-invalid]="invalid('invoiceDate') || errors()['invoiceDate']" />
+              @for (m of errors()['invoiceDate'] ?? []; track m) { <div class="invalid-feedback d-block">{{ m }}</div> }
+            </div>
+            <div class="col-md-6">
+              <label class="form-label" for="tax">Tax</label>
+              <div class="input-group">
+                <span class="input-group-text">$</span>
+                <input id="tax" type="number" step="0.01" min="0" class="form-control" formControlName="taxAmount" [class.is-invalid]="invalid('taxAmount')" />
+              </div>
+            </div>
+            <div class="col-12">
+              <label class="form-label" for="notes">Notes</label>
+              <textarea id="notes" rows="2" class="form-control" formControlName="notes" placeholder="PO number, context for the approver..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Line items</span>
+            <button type="button" class="btn btn-sm btn-outline-primary" (click)="addLine()"><i class="bi bi-plus-lg"></i> Add line</button>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle" formArrayName="lines">
+              <thead><tr><th style="min-width:220px">Description</th><th style="width:110px">GL</th><th style="width:110px">Qty</th><th style="width:150px">Unit price</th><th class="num">Amount</th><th></th></tr></thead>
+              <tbody>
+                @for (line of lines.controls; track line; let i = $index) {
+                  <tr [formGroupName]="i">
+                    <td><input class="form-control form-control-sm" formControlName="description" [class.is-invalid]="invalid('lines.' + i + '.description')" /></td>
+                    <td><input class="form-control form-control-sm" formControlName="glAccount" maxlength="4" [class.is-invalid]="invalid('lines.' + i + '.glAccount')" /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" formControlName="quantity" [class.is-invalid]="invalid('lines.' + i + '.quantity')" /></td>
+                    <td><input type="number" step="0.01" class="form-control form-control-sm" formControlName="unitPrice" [class.is-invalid]="invalid('lines.' + i + '.unitPrice')" /></td>
+                    <td class="num">{{ lineTotal(i) | currency: 'USD' }}</td>
+                    <td class="text-end">
+                      <button type="button" class="btn btn-sm btn-link text-danger" (click)="removeLine(i)" [disabled]="lines.length === 1" aria-label="Remove line">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-4">
+        <div class="card position-sticky" style="top: 80px">
+          <div class="card-header">Summary</div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-1"><span class="text-muted-2">Subtotal</span><span class="num">{{ subtotal() | currency: 'USD' }}</span></div>
+            <div class="d-flex justify-content-between mb-2"><span class="text-muted-2">Tax</span><span class="num">{{ form.controls.taxAmount.value | currency: 'USD' }}</span></div>
+            <div class="d-flex justify-content-between fs-5 fw-bold border-top pt-2"><span>Total</span><span class="num">{{ total() | currency: 'USD' }}</span></div>
+            @if (needsController()) {
+              <div class="alert alert-warning small mt-3 mb-0"><i class="bi bi-shield-exclamation me-1"></i>Over $10,000: a controller must approve this invoice.</div>
+            }
+          </div>
+          <div class="card-footer bg-white d-grid gap-2">
+            <button type="button" class="btn btn-primary" [disabled]="saving()" (click)="save(true)">
+              <i class="bi bi-send me-1"></i>Save and submit for approval
+            </button>
+            <button type="submit" class="btn btn-outline-secondary" [disabled]="saving()">Save draft</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+}

@@ -1,0 +1,43 @@
+<div class="login-wrap">
+  <div class="login-card card">
+    <div class="card-body p-4 p-md-5">
+      <div class="d-flex align-items-center gap-2 mb-4">
+        <span class="mark"><i class="bi bi-journal-check"></i></span>
+        <span class="fs-4 fw-bold">LedgerFlow</span>
+      </div>
+      <h1 class="h5 fw-semibold mb-1">Sign in</h1>
+      <p class="text-muted-2 small mb-4">Accounts payable approvals, payment runs and reporting.</p>
+
+      @if (error()) {
+        <div class="alert alert-danger small py-2">{{ error() }}</div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        <div class="mb-3">
+          <label class="form-label" for="email">Email</label>
+          <input id="email" type="email" class="form-control" formControlName="email" autocomplete="username" />
+        </div>
+        <div class="mb-4">
+          <label class="form-label" for="password">Password</label>
+          <input id="password" type="password" class="form-control" formControlName="password" autocomplete="current-password" />
+        </div>
+        <button class="btn btn-primary w-100" type="submit" [disabled]="busy() || form.invalid">
+          @if (busy()) { <span class="spinner-border spinner-border-sm me-1"></span> }
+          Sign in
+        </button>
+      </form>
+
+      <div class="demo mt-4">
+        <div class="small fw-semibold mb-2">Demo accounts</div>
+        <div class="d-grid gap-2">
+          @for (d of demos; track d.email) {
+            <button class="btn btn-sm btn-outline-secondary text-start d-flex justify-content-between" (click)="useDemo(d.email)">
+              <span><i class="bi {{ d.icon }} me-2"></i>{{ d.role }}</span>
+              <span class="text-muted-2">{{ d.email }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

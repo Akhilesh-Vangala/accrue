@@ -1,0 +1,94 @@
+<div class="page-head">
+  <h1 class="page-title">Vendors</h1>
+  @if (auth.canEnterInvoices()) {
+    <button class="btn btn-primary" (click)="edit('new')"><i class="bi bi-plus-lg me-1"></i>New vendor</button>
+  }
+</div>
+
+@if (editing(); as target) {
+  <div class="card mb-3 border-primary">
+    <div class="card-header">{{ target === 'new' ? 'New vendor' : 'Edit ' + target.name }}</div>
+    <form class="card-body row g-3" [formGroup]="form" (ngSubmit)="save()" novalidate>
+      <div class="col-md-6">
+        <label class="form-label" for="vname">Legal name</label>
+        <input id="vname" class="form-control" formControlName="name" [class.is-invalid]="invalid('name')" />
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="vtax">Tax ID (EIN)</label>
+        <input id="vtax" class="form-control" formControlName="taxId" placeholder="12-3456789" [class.is-invalid]="invalid('taxId')" />
+        @for (m of errors()['taxId'] ?? []; track m) { <div class="invalid-feedback d-block">{{ m }}</div> }
+      </div>
+      <div class="col-md-3">
+        <label class="form-label" for="vterms">Payment terms (days)</label>
+        <input id="vterms" type="number" class="form-control" formControlName="paymentTermsDays" [class.is-invalid]="invalid('paymentTermsDays')" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="vemail">Remittance email</label>
+        <input id="vemail" type="email" class="form-control" formControlName="email" [class.is-invalid]="invalid('email')" />
+      </div>
+      <div class="col-md-6">
+        <label class="form-label" for="vcat">Category</label>
+        <select id="vcat" class="form-select" formControlName="category" [class.is-invalid]="invalid('category')">
+          <option value="" disabled>Select a category</option>
+          @for (c of categories(); track c) { <option [value]="c">{{ c }}</option> }
+        </select>
+      </div>
+      <div class="col-12 d-flex gap-2 justify-content-end">
+        <button type="button" class="btn btn-light" (click)="editing.set(null)">Cancel</button>
+        <button type="submit" class="btn btn-primary" [disabled]="saving()">Save vendor</button>
+      </div>
+    </form>
+  </div>
+}
+
+<div class="card">
+  <div class="card-body border-bottom d-flex flex-wrap gap-3 align-items-center">
+    <div class="input-group" style="max-width: 360px">
+      <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
+      <input class="form-control" placeholder="Name, tax ID or email" [(ngModel)]="search" (keyup.enter)="load()" />
+      <button class="btn btn-outline-secondary" (click)="load()">Search</button>
+    </div>
+    <div class="form-check form-switch">
+      <input class="form-check-input" type="checkbox" id="inactive" [(ngModel)]="includeInactive" (ngModelChange)="load()" />
+      <label class="form-check-label small" for="inactive">Show inactive</label>
+    </div>
+  </div>
+
+  @if (result(); as r) {
+    <div class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead><tr><th>Vendor</th><th>Category</th><th>Tax ID</th><th class="num">Terms</th><th class="num">Open invoices</th><th class="num">Open balance</th><th></th></tr></thead>
+        <tbody>
+          @for (v of r.items; track v.id) {
+            <tr [class.opacity-50]="!v.isActive">
+              <td>
+                <div class="fw-semibold">{{ v.name }}</div>
+                <div class="small text-muted-2">{{ v.email }}</div>
+              </td>
+              <td>{{ v.category }}</td>
+              <td><code>{{ v.taxId }}</code></td>
+              <td class="num">Net {{ v.paymentTermsDays }}</td>
+              <td class="num"><a [routerLink]="['/invoices']" [queryParams]="{ vendorId: v.id }">{{ v.openInvoices }}</a></td>
+              <td class="num fw-semibold">{{ v.openBalance | currency: 'USD' }}</td>
+              <td class="text-end text-nowrap">
+                @if (auth.canEnterInvoices()) {
+                  <button class="btn btn-sm btn-link" (click)="edit(v)" aria-label="Edit"><i class="bi bi-pencil"></i></button>
+                }
+                @if (auth.isController()) {
+                  <button class="btn btn-sm btn-link" [class.text-danger]="v.isActive" (click)="toggleActive(v)">
+                    {{ v.isActive ? 'Deactivate' : 'Activate' }}
+                  </button>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="7" class="empty">No vendors found.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <lf-pager [page]="r.page" [pageSize]="r.pageSize" [total]="r.totalCount" (pageChange)="load($event)" />
+  } @else {
+    <lf-loading />
+  }
+</div>

@@ -1,0 +1,21 @@
+# Backend (.NET)
+backend/**/bin/
+backend/**/obj/
+TestResults/
+*.user
+*.suo
+.vs/
+*.trx
+coverage*.xml
+
+# Frontend (Angular); the production build lands in the API's wwwroot
+frontend/node_modules/
+frontend/.angular/
+frontend/dist/
+backend/src/LedgerFlow.Api/wwwroot/
+
+# Local secrets and tooling
+.env
+*.local.json
+.DS_Store
+.idea/

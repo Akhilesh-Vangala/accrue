@@ -1,0 +1,13 @@
+@if (total() > 0) {
+  <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center px-3 py-2 border-top small text-muted-2">
+    <span>{{ from() }}-{{ to() }} of {{ total() }}</span>
+    <div class="btn-group btn-group-sm">
+      <button class="btn btn-outline-secondary" [disabled]="page() <= 1" (click)="pageChange.emit(page() - 1)">
+        <i class="bi bi-chevron-left"></i> Prev
+      </button>
+      <button class="btn btn-outline-secondary" [disabled]="page() >= pages()" (click)="pageChange.emit(page() + 1)">
+        Next <i class="bi bi-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+}

@@ -1,0 +1,213 @@
+# LedgerFlow CI/CD for Azure DevOps Pipelines.
+#
+# One-time setup (Project settings):
+#   1. Service connection (Azure Resource Manager) named in `azureServiceConnection`.
+#   2. Variable group `ledgerflow-secrets` (Pipelines > Library) with secret variables:
+#        SqlAdminPassword       Azure SQL admin password used by infra/main.bicep
+#        TelerikNugetKey        Telerik NuGet API key (only when UseTelerik = true)
+#        TelerikLicenseKey      Telerik license key (only when UseTelerik = true)
+#   3. Environment named `ledgerflow-dev` (add an approval check for gated deploys).
+#
+# Without Telerik credentials the pipeline builds the CSV reporting fallback; set UseTelerik to true once the trial feed is configured.
+
+trigger:
+  branches:
+    include: [main]
+  paths:
+    exclude: ['**/*.md', docs/**]
+
+pr:
+  branches:
+    include: [main]
+
+variables:
+  - group: ledgerflow-secrets
+  - name: buildConfiguration
+    value: Release
+  - name: UseTelerik
+    value: false
+  - name: azureServiceConnection
+    value: ledgerflow-azure
+  - name: resourceGroup
+    value: rg-ledgerflow-dev
+  - name: location
+    value: eastus2
+  - name: sqlAdminLogin
+    value: ledgerflowadmin
+  # Throwaway password for the CI-only SQL Server container; it never leaves the agent.
+  - name: ciSqlPassword
+    value: Ci-LedgerFlow!2026
+
+resources:
+  containers:
+    - container: mssql
+      image: mcr.microsoft.com/mssql/server:2022-latest
+      ports:
+        - 1433:1433
+      env:
+        ACCEPT_EULA: Y
+        MSSQL_SA_PASSWORD: $(ciSqlPassword)
+
+stages:
+  - stage: Build
+    displayName: Build and test
+    jobs:
+      - job: BuildTest
+        displayName: .NET 9 + Angular 17
+        pool:
+          vmImage: ubuntu-latest
+        services:
+          mssql: mssql
+        variables:
+          NUGET_PACKAGES: $(Pipeline.Workspace)/.nuget/packages
+          npm_config_cache: $(Pipeline.Workspace)/.npm
+        steps:
+          - task: UseDotNet@2
+            displayName: Install .NET SDK from global.json
+            inputs:
+              useGlobalJson: true
+              workingDirectory: backend
+
+          - task: NodeTool@0
+            displayName: Install Node 20
+            inputs:
+              versionSpec: 20.x
+
+          - task: Cache@2
+            displayName: Cache NuGet packages
+            inputs:
+              key: 'nuget | "$(Agent.OS)" | backend/Directory.Packages.props | backend/**/*.csproj'
+              path: $(NUGET_PACKAGES)
+
+          - task: Cache@2
+            displayName: Cache npm
+            inputs:
+              key: 'npm | "$(Agent.OS)" | frontend/package-lock.json'
+              path: $(npm_config_cache)
+
+          - script: dotnet restore LedgerFlow.sln -p:UseTelerik=$(UseTelerik)
+            displayName: dotnet restore
+            workingDirectory: backend
+            env:
+              TELERIK_NUGET_USER: api-key
+              TELERIK_NUGET_KEY: $(TelerikNugetKey)
+
+          - script: dotnet build LedgerFlow.sln -c $(buildConfiguration) --no-restore -p:UseTelerik=$(UseTelerik)
+            displayName: dotnet build (warnings are errors)
+            workingDirectory: backend
+            env:
+              TELERIK_LICENSE: $(TelerikLicenseKey)
+
+          - script: |
+              for i in $(seq 1 30); do
+                if (exec 3<>/dev/tcp/127.0.0.1/1433) 2>/dev/null; then echo "SQL Server is accepting connections"; sleep 5; exit 0; fi
+                sleep 2
+              done
+              echo "SQL Server did not start"; exit 1
+            displayName: Wait for SQL Server container
+
+          - script: >
+              dotnet test LedgerFlow.sln -c $(buildConfiguration) --no-build
+              --logger trx --results-directory $(Agent.TempDirectory)/tests
+              --collect "XPlat Code Coverage"
+            displayName: dotnet test (unit + integration)
+            workingDirectory: backend
+            env:
+              LEDGERFLOW_TEST_SQL: Server=127.0.0.1,1433;User Id=sa;Password=$(ciSqlPassword);TrustServerCertificate=True;Encrypt=True
+
+          - task: PublishTestResults@2
+            displayName: Publish test results
+            condition: succeededOrFailed()
+            inputs:
+              testResultsFormat: VSTest
+              testResultsFiles: $(Agent.TempDirectory)/tests/**/*.trx
+
+          - task: PublishCodeCoverageResults@2
+            displayName: Publish code coverage
+            condition: succeededOrFailed()
+            inputs:
+              summaryFileLocation: $(Agent.TempDirectory)/tests/**/coverage.cobertura.xml
+
+          - script: npm ci
+            displayName: npm ci
+            workingDirectory: frontend
+
+          - script: npm run test:ci
+            displayName: Angular unit tests (headless Chrome)
+            workingDirectory: frontend
+
+          - script: npx ng build --configuration production
+            displayName: Angular build into backend/src/LedgerFlow.Api/wwwroot
+            workingDirectory: frontend
+
+          - script: >
+              dotnet publish backend/src/LedgerFlow.Api/LedgerFlow.Api.csproj -c $(buildConfiguration) --no-restore
+              -p:UseTelerik=$(UseTelerik) -o $(Build.ArtifactStagingDirectory)/api
+            displayName: dotnet publish
+            env:
+              TELERIK_LICENSE: $(TelerikLicenseKey)
+
+          - task: ArchiveFiles@2
+            displayName: Zip deployment package
+            inputs:
+              rootFolderOrFile: $(Build.ArtifactStagingDirectory)/api
+              includeRootFolder: false
+              archiveFile: $(Build.ArtifactStagingDirectory)/ledgerflow.zip
+
+          - publish: $(Build.ArtifactStagingDirectory)/ledgerflow.zip
+            artifact: app
+
+          - publish: infra
+            artifact: infra
+
+  - stage: Deploy
+    displayName: Deploy to Azure (dev)
+    dependsOn: Build
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/main'), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - deployment: DeployDev
+        displayName: Provision and deploy
+        pool:
+          vmImage: ubuntu-latest
+        environment: ledgerflow-dev
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - task: AzureCLI@2
+                  name: infra
+                  displayName: Provision Azure SQL + App Service (Bicep)
+                  inputs:
+                    azureSubscription: $(azureServiceConnection)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    inlineScript: |
+                      set -euo pipefail
+                      az group create -n "$(resourceGroup)" -l "$(location)" --tags application=LedgerFlow -o none
+                      outputs=$(az deployment group create \
+                        -g "$(resourceGroup)" \
+                        -f "$(Pipeline.Workspace)/infra/main.bicep" \
+                        -p environment=dev sqlAdminLogin="$(sqlAdminLogin)" sqlAdminPassword="$SQL_ADMIN_PASSWORD" \
+                        --query properties.outputs -o json)
+                      echo "##vso[task.setvariable variable=webAppName;isOutput=true]$(echo "$outputs" | jq -r .webAppName.value)"
+                      echo "##vso[task.setvariable variable=webAppUrl;isOutput=true]$(echo "$outputs" | jq -r .webAppUrl.value)"
+                  env:
+                    SQL_ADMIN_PASSWORD: $(SqlAdminPassword)
+
+                - task: AzureWebApp@1
+                  displayName: Deploy to App Service (Windows)
+                  inputs:
+                    azureSubscription: $(azureServiceConnection)
+                    appType: webApp
+                    appName: $(infra.webAppName)
+                    package: $(Pipeline.Workspace)/app/ledgerflow.zip
+                    deploymentMethod: zipDeploy
+
+                - script: |
+                    for i in $(seq 1 30); do
+                      status=$(curl -s -o /dev/null -w "%{http_code}" "$(infra.webAppUrl)/health" || true)
+                      if [ "$status" = "200" ]; then echo "Healthy: $(infra.webAppUrl)"; exit 0; fi
+                      echo "Waiting for app ($status)"; sleep 10
+                    done
+                    exit 1
+                  displayName: Smoke test /health

@@ -1,0 +1,118 @@
+@if (invoice(); as inv) {
+  <div class="page-head">
+    <div>
+      <a class="small text-decoration-none" routerLink="/invoices"><i class="bi bi-arrow-left"></i> Invoices</a>
+      <h1 class="page-title d-flex align-items-center gap-2 flex-wrap">
+        {{ inv.summary.invoiceNumber }}
+        <lf-status [status]="inv.summary.status" [overdue]="inv.summary.isOverdue" />
+      </h1>
+      <div class="text-muted-2 small">{{ inv.summary.vendorName }}</div>
+    </div>
+    <div class="d-flex gap-2 flex-wrap">
+      @if (can('edit')) {
+        <a class="btn btn-outline-secondary" [routerLink]="['/invoices', inv.summary.id, 'edit']"><i class="bi bi-pencil me-1"></i>Edit</a>
+      }
+      @if (can('submit')) {
+        <button class="btn btn-primary" [disabled]="busy()" (click)="run('submit')"><i class="bi bi-send me-1"></i>Submit for approval</button>
+      }
+      @if (can('reject')) {
+        <button class="btn btn-outline-danger" [disabled]="busy()" (click)="openDecision('reject')"><i class="bi bi-x-lg me-1"></i>Reject</button>
+      }
+      @if (can('approve')) {
+        <button class="btn btn-success" [disabled]="busy()" (click)="openDecision('approve')"><i class="bi bi-check-lg me-1"></i>Approve</button>
+      }
+    </div>
+  </div>
+
+  @if (inv.summary.status === 'Submitted' && !can('approve')) {
+    <div class="alert alert-light border small">
+      <i class="bi bi-info-circle me-1"></i>
+      Waiting for {{ inv.summary.total > 10000 ? 'a controller' : 'an approver' }}. The person who entered an invoice cannot approve it.
+    </div>
+  }
+
+  @if (decision(); as kind) {
+    <div class="card border-{{ kind === 'approve' ? 'success' : 'danger' }} mb-3">
+      <div class="card-body">
+        <label class="form-label" for="comment">
+          {{ kind === 'approve' ? 'Approval note (optional)' : 'Reason for rejection (required, the clerk will see this)' }}
+        </label>
+        <textarea id="comment" class="form-control mb-2" rows="2" [(ngModel)]="comment"></textarea>
+        <div class="d-flex gap-2 justify-content-end">
+          <button class="btn btn-light" (click)="decision.set(null)">Cancel</button>
+          <button class="btn" [class.btn-success]="kind === 'approve'" [class.btn-danger]="kind === 'reject'"
+                  [disabled]="busy() || (kind === 'reject' && !comment.trim())" (click)="run(kind)">
+            Confirm {{ kind }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="card mb-3">
+        <div class="card-header">Line items</div>
+        <div class="table-responsive">
+          <table class="table">
+            <thead><tr><th>Description</th><th>GL</th><th class="num">Qty</th><th class="num">Unit price</th><th class="num">Amount</th></tr></thead>
+            <tbody>
+              @for (l of inv.lines; track l.id) {
+                <tr>
+                  <td>{{ l.description }}</td>
+                  <td><code>{{ l.glAccount }}</code></td>
+                  <td class="num">{{ l.quantity }}</td>
+                  <td class="num">{{ l.unitPrice | currency: 'USD' }}</td>
+                  <td class="num">{{ l.lineTotal | currency: 'USD' }}</td>
+                </tr>
+              }
+            </tbody>
+            <tfoot>
+              <tr><td colspan="4" class="text-end text-muted-2">Subtotal</td><td class="num">{{ inv.subtotal | currency: 'USD' }}</td></tr>
+              <tr><td colspan="4" class="text-end text-muted-2">Tax</td><td class="num">{{ inv.taxAmount | currency: 'USD' }}</td></tr>
+              <tr class="fw-bold"><td colspan="4" class="text-end">Total</td><td class="num">{{ inv.summary.total | currency: 'USD' }}</td></tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      @if (inv.notes) {
+        <div class="card"><div class="card-body"><div class="small text-muted-2 mb-1">Notes</div>{{ inv.notes }}</div></div>
+      }
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card mb-3">
+        <div class="card-body">
+          <dl>
+            <dt>Invoice date</dt><dd>{{ inv.summary.invoiceDate | date: 'MMM d, y' }}</dd>
+            <dt>Due date</dt><dd [class.text-danger]="inv.summary.isOverdue">{{ inv.summary.dueDate | date: 'MMM d, y' }}</dd>
+            <dt>Outstanding</dt><dd class="fw-semibold">{{ inv.summary.outstanding | currency: 'USD' }}</dd>
+            <dt>Entered by</dt><dd>{{ inv.summary.createdBy }}</dd>
+            @if (inv.summary.paymentRunId) {
+              <dt>Payment run</dt><dd><a [routerLink]="['/payment-runs', inv.summary.paymentRunId]">#{{ inv.summary.paymentRunId }}</a></dd>
+            }
+          </dl>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header">Audit trail</div>
+        <div class="card-body py-1">
+          <ul class="timeline">
+            @for (e of inv.events; track $index) {
+              <li>
+                <i class="bi {{ icon(e.type) }}"></i>
+                <div class="small">
+                  <div><span class="fw-semibold">{{ e.type }}</span> by {{ e.actor }}</div>
+                  @if (e.comment) { <div class="text-muted-2">"{{ e.comment }}"</div> }
+                  <div class="text-muted-2">{{ e.occurredAt | date: 'MMM d, y, h:mm a' }}</div>
+                </div>
+              </li>
+            }
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <lf-loading />
+}

@@ -1,0 +1,149 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Good to see you, {{ auth.user()?.displayName?.split(' ')?.[0] }}</h1>
+    <div class="text-muted-2 small">Accounts payable at a glance</div>
+  </div>
+  @if (auth.canEnterInvoices()) {
+    <a class="btn btn-primary" routerLink="/invoices/new"><i class="bi bi-plus-lg me-1"></i>New invoice</a>
+  }
+</div>
+
+@if (data(); as d) {
+  <div class="row g-3 mb-3">
+    <div class="col-6 col-xl-3">
+      <a class="kpi-link" routerLink="/invoices">
+        <div class="card kpi h-100"><div class="card-body">
+          <div class="kpi-label">Open payables</div>
+          <div class="kpi-value">{{ d.kpis.openPayables | currency: 'USD' : 'symbol' : '1.0-0' }}</div>
+          <div class="kpi-sub">{{ d.kpis.openInvoices }} invoices awaiting payment</div>
+        </div></div>
+      </a>
+    </div>
+    <div class="col-6 col-xl-3">
+      <a class="kpi-link" routerLink="/invoices" [queryParams]="{ overdue: true }">
+        <div class="card kpi h-100"><div class="card-body">
+          <div class="kpi-label">Overdue</div>
+          <div class="kpi-value text-danger">{{ d.kpis.overdueAmount | currency: 'USD' : 'symbol' : '1.0-0' }}</div>
+          <div class="kpi-sub">{{ d.kpis.overdueInvoices }} invoices past due</div>
+        </div></div>
+      </a>
+    </div>
+    <div class="col-6 col-xl-3">
+      <a class="kpi-link" [routerLink]="auth.canApprove() ? '/approvals' : '/invoices'" [queryParams]="auth.canApprove() ? {} : { status: 'Submitted' }">
+        <div class="card kpi h-100"><div class="card-body">
+          <div class="kpi-label">Pending approval</div>
+          <div class="kpi-value">{{ d.kpis.pendingApprovals }}</div>
+          <div class="kpi-sub">
+            @if (d.kpis.averageApprovalHours !== null) {
+              Avg. {{ d.kpis.averageApprovalHours | number: '1.0-1' }} h to approve
+            } @else { No approvals in 90 days }
+          </div>
+        </div></div>
+      </a>
+    </div>
+    <div class="col-6 col-xl-3">
+      <a class="kpi-link" routerLink="/payment-runs">
+        <div class="card kpi h-100"><div class="card-body">
+          <div class="kpi-label">Ready to pay</div>
+          <div class="kpi-value">{{ d.kpis.readyToPay | currency: 'USD' : 'symbol' : '1.0-0' }}</div>
+          <div class="kpi-sub">{{ d.kpis.paidLast30Days | currency: 'USD' : 'symbol' : '1.0-0' }} paid in 30 days</div>
+        </div></div>
+      </a>
+    </div>
+  </div>
+
+  <div class="row g-3 mb-3">
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between">
+          <span>AP aging</span>
+          <span class="text-muted-2 small fw-normal">{{ agingTotal() | currency: 'USD' : 'symbol' : '1.0-0' }} open</span>
+        </div>
+        <div class="card-body">
+          @for (a of d.aging; track a.bucket; let i = $index) {
+            <div class="mb-3">
+              <div class="d-flex justify-content-between small mb-1">
+                <span><span class="legend-dot" [style.background]="colors[i]"></span>{{ a.bucket === 'Current' ? 'Not yet due' : a.bucket + ' days' }}
+                  <span class="text-muted-2">· {{ a.invoiceCount }}</span></span>
+                <span class="fw-semibold num">{{ a.amount | currency: 'USD' : 'symbol' : '1.0-0' }}</span>
+              </div>
+              <div class="bar-track"><div class="bar-fill" [style.width.%]="(a.amount / agingMax()) * 100" [style.background]="colors[i]"></div></div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-header d-flex justify-content-between">
+          <span>Aging trend, last 30 days</span>
+          <span class="small fw-normal">
+            <span class="legend-dot" style="background:#10b981"></span>Not yet due
+            <span class="legend-dot ms-2" style="background:#ef4444"></span>Past due
+          </span>
+        </div>
+        <div class="card-body">
+          @if (trend(); as t) {
+            <svg class="chart" viewBox="0 0 600 175" preserveAspectRatio="none" role="img" aria-label="Aging trend">
+              <line x1="0" y1="160" x2="600" y2="160" stroke="#e3e9e6" />
+              <polyline [attr.points]="t.current" fill="none" stroke="#10b981" stroke-width="2.5" vector-effect="non-scaling-stroke" />
+              <polyline [attr.points]="t.overdue" fill="none" stroke="#ef4444" stroke-width="2.5" vector-effect="non-scaling-stroke" />
+            </svg>
+            <div class="d-flex justify-content-between small text-muted-2">
+              <span>{{ t.first | date: 'MMM d' }}</span>
+              <span>Today: {{ t.latest.overdue | currency: 'USD' : 'symbol' : '1.0-0' }} past due</span>
+              <span>{{ t.last | date: 'MMM d' }}</span>
+            </div>
+          } @else {
+            <div class="empty">The nightly snapshot job has not collected enough history yet.</div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-lg-7">
+      <div class="card h-100">
+        <div class="card-header">Invoiced spend by month</div>
+        <div class="card-body">
+          <svg class="chart" viewBox="0 0 600 175" preserveAspectRatio="none" role="img" aria-label="Monthly spend">
+            <line x1="0" y1="160" x2="600" y2="160" stroke="#e3e9e6" />
+            @for (b of spendBars(); track b.label) {
+              <rect [attr.x]="b.x" [attr.y]="b.y" [attr.width]="b.w" [attr.height]="b.h" rx="3" fill="#0f9d76">
+                <title>{{ b.label | date: 'MMM yyyy' }}: {{ b.amount | currency: 'USD' : 'symbol' : '1.0-0' }}</title>
+              </rect>
+            }
+          </svg>
+          <div class="d-flex justify-content-between small text-muted-2">
+            @for (b of spendBars(); track b.label) {
+              <span>{{ b.label | date: 'MMM' }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="card h-100">
+        <div class="card-header">Largest open balances</div>
+        <table class="table table-hover table-clickable">
+          <thead><tr><th>Vendor</th><th class="num">Invoices</th><th class="num">Open</th></tr></thead>
+          <tbody>
+            @for (v of d.topVendors; track v.vendorId) {
+              <tr [routerLink]="['/invoices']" [queryParams]="{ vendorId: v.vendorId }">
+                <td>{{ v.vendorName }}</td>
+                <td class="num">{{ v.openInvoices }}</td>
+                <td class="num fw-semibold">{{ v.openBalance | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+              </tr>
+            } @empty {
+              <tr><td colspan="3" class="empty">Nothing outstanding.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+} @else {
+  <lf-loading />
+}

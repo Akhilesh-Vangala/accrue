@@ -1,0 +1,83 @@
+<div class="shell" [class.nav-open]="navOpen()">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/dashboard">
+      <span class="brand-mark"><i class="bi bi-journal-check"></i></span>
+      <span>LedgerFlow</span>
+    </a>
+    <nav class="nav flex-column">
+      @for (item of nav; track item.path) {
+        @if (item.visible()) {
+          <a class="nav-link" [routerLink]="item.path" routerLinkActive="active" (click)="navOpen.set(false)">
+            <i class="bi {{ item.icon }}"></i>{{ item.label }}
+          </a>
+        }
+      }
+    </nav>
+    <div class="sidebar-foot">
+      <div class="small">Accounts payable</div>
+      <div class="small opacity-75">.NET 9 · Angular 17 · Hangfire</div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="btn btn-sm btn-outline-secondary d-lg-none" (click)="navOpen.set(!navOpen())" aria-label="Toggle navigation">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="flex-grow-1"></div>
+
+      <div class="position-relative">
+        <button class="btn btn-light position-relative" (click)="bellOpen.set(!bellOpen())" aria-label="Notifications">
+          <i class="bi bi-bell"></i>
+          @if (feed().unreadCount > 0) {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ feed().unreadCount }}</span>
+          }
+        </button>
+        @if (bellOpen()) {
+          <div class="bell-panel card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <span>Notifications</span>
+              <button class="btn btn-link btn-sm p-0" (click)="markAllRead()" [disabled]="feed().unreadCount === 0">Mark all read</button>
+            </div>
+            <div class="list-group list-group-flush bell-list">
+              @for (n of feed().items; track n.id) {
+                <button class="list-group-item list-group-item-action" [class.unread]="!n.isRead" (click)="open(n)">
+                  <div class="fw-semibold small">{{ n.title }}</div>
+                  <div class="small text-muted-2">{{ n.body }}</div>
+                  <div class="tiny text-muted-2">{{ n.createdAt | date: 'MMM d, h:mm a' }}</div>
+                </button>
+              } @empty {
+                <div class="empty small">You're all caught up.</div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="user">
+        <span class="avatar">{{ auth.displayInitials() }}</span>
+        <div class="d-none d-sm-block lh-sm">
+          <div class="fw-semibold small">{{ auth.user()?.displayName }}</div>
+          <div class="tiny text-muted-2">{{ auth.roleLabel() }}</div>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary ms-2" (click)="auth.logout()" title="Sign out">
+          <i class="bi bi-box-arrow-right"></i>
+        </button>
+      </div>
+    </header>
+
+    <main class="content">
+      <router-outlet />
+    </main>
+  </div>
+</div>
+
+<div class="toast-stack">
+  @for (t of toasts.toasts(); track t.id) {
+    <div class="alert alert-{{ t.kind }} shadow-sm d-flex align-items-start gap-2 mb-0" role="status">
+      <i class="bi" [class.bi-check-circle]="t.kind === 'success'" [class.bi-exclamation-octagon]="t.kind === 'danger'" [class.bi-info-circle]="t.kind === 'info'"></i>
+      <div class="flex-grow-1 small">{{ t.text }}</div>
+      <button class="btn-close btn-sm" (click)="toasts.dismiss(t.id)" aria-label="Dismiss"></button>
+    </div>
+  }
+</div>

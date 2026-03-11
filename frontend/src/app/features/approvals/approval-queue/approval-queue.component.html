@@ -1,0 +1,41 @@
+<div class="page-head">
+  <div>
+    <h1 class="page-title">Approval queue</h1>
+    <div class="text-muted-2 small">
+      @if (auth.isController()) { All submitted invoices you did not enter yourself. }
+      @else { Submitted invoices up to $10,000 that you did not enter yourself. Larger invoices go to a controller. }
+    </div>
+  </div>
+  @if (queue(); as q) {
+    <div class="text-end">
+      <div class="kpi-label small text-muted-2">{{ q.length }} waiting</div>
+      <div class="fs-5 fw-bold num">{{ total() | currency: 'USD' }}</div>
+    </div>
+  }
+</div>
+
+<div class="card">
+  @if (queue(); as q) {
+    <div class="table-responsive">
+      <table class="table table-hover table-clickable align-middle">
+        <thead><tr><th>Invoice</th><th>Vendor</th><th>Entered by</th><th>Due</th><th></th><th class="num">Total</th></tr></thead>
+        <tbody>
+          @for (i of q; track i.id) {
+            <tr [routerLink]="['/invoices', i.id]">
+              <td class="fw-semibold text-nowrap">{{ i.invoiceNumber }}</td>
+              <td>{{ i.vendorName }}</td>
+              <td class="small">{{ i.createdBy }}</td>
+              <td [class.text-danger]="i.isOverdue">{{ i.dueDate | date: 'MMM d, y' }}</td>
+              <td><lf-status [status]="i.status" [overdue]="i.isOverdue" /></td>
+              <td class="num fw-semibold">{{ i.total | currency: 'USD' }}</td>
+            </tr>
+          } @empty {
+            <tr><td colspan="6" class="empty"><i class="bi bi-check2-all fs-3 d-block mb-1"></i>Nothing waiting for you.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  } @else {
+    <lf-loading />
+  }
+</div>
