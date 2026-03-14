@@ -178,7 +178,7 @@ Conventions:
 
    Or run `npx ng build`, which writes into the API's `wwwroot`; then everything is served from http://localhost:5076.
 
-4. **Sign in** with a demo account. The password is `LedgerFlow!2026` for all three.
+4. **Sign in** with a seeded demo account — roles and passwords are listed in [`docs/DEMO-ACCOUNTS.md`](docs/DEMO-ACCOUNTS.md) (local/dev only).
 
    | Account | Role |
    | --- | --- |
