@@ -4,15 +4,9 @@ Accounts payable platform: vendor invoices go through a role-based approval work
 
 Built with C#, ASP.NET Core Web API on .NET 9, EF Core, Azure SQL Server, Hangfire, Telerik Reporting, Angular 17, TypeScript and Bootstrap. It ships as a Visual Studio 2022 solution and deploys through Azure DevOps.
 
-![Dashboard](docs/screenshots/dashboard.png)
+[**Open LedgerFlow ↗**](https://ledgerflow.vercel.app/)
 
-| Invoice approval with audit trail | Approval queue |
-| --- | --- |
-| ![Invoice detail](docs/screenshots/invoice-detail.png) | ![Approvals](docs/screenshots/approvals.png) |
-| **Payment run with ACH references** | **Background jobs (Hangfire)** |
-| ![Payment run](docs/screenshots/payment-run.png) | ![Jobs](docs/screenshots/jobs.png) |
-| **Reports and archive** | **Hangfire dashboard** |
-| ![Reports](docs/screenshots/reports.png) | ![Hangfire](docs/screenshots/hangfire.png) |
+![Dashboard](docs/screenshots/dashboard.png)
 
 ## What it does
 
