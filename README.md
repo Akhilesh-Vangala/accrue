@@ -1,12 +1,20 @@
 # LedgerFlow
 
-Accounts payable platform: vendor invoices go through a role-based approval workflow, get batched into payment runs, and feed aging and spend reporting. Background jobs flag overdue invoices, remind controllers, snapshot aging every night, draft weekly payment runs, and archive reports.
+Accounts payable: a clerk enters a vendor invoice, an approver can accept it only inside a dollar limit and only if they did not enter it, and a controller releases a payment run. Nightly jobs snapshot aging, flag overdue invoices, and draft the next run.
 
-Built with C#, ASP.NET Core Web API on .NET 9, EF Core, Azure SQL Server, Hangfire, Telerik Reporting, Angular 17, TypeScript and Bootstrap. It ships as a Visual Studio 2022 solution and deploys through Azure DevOps.
+Built with C#, ASP.NET Core on .NET 9, EF Core, Azure SQL, Hangfire, Telerik Reporting, and Angular 17. Deployed through Azure DevOps.
 
-[**Open LedgerFlow ↗**](https://ledgerflow.vercel.app/)
+[Open LedgerFlow](https://ledgerflow.vercel.app/) · [Demo accounts](docs/DEMO-ACCOUNTS.md)
 
-![Dashboard](docs/screenshots/dashboard.png)
+![Dashboard: open payables, overdue amount, pending approvals, and AP aging buckets](docs/screenshots/dashboard.png)
+
+| If you want | Open |
+| --- | --- |
+| Business rules | `backend/src/LedgerFlow.Domain` |
+| HTTP API | `backend/src/LedgerFlow.Api` |
+| Invoice, approval, and payment UI | `frontend/src/app/features` |
+| Recurring jobs | `backend/src/LedgerFlow.Application/Jobs` |
+| Azure deploy | `azure-pipelines.yml`, `infra/` |
 
 ## What it does
 
