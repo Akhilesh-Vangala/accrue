@@ -16,6 +16,8 @@ Built with C#, ASP.NET Core on .NET 9, EF Core, Azure SQL, Hangfire, Telerik Rep
 | Recurring jobs | `backend/src/LedgerFlow.Application/Jobs` |
 | Azure deploy | `azure-pipelines.yml`, `infra/` |
 
+The split is the Angular app in `frontend/` and the .NET API in `backend/`. This repository has no model layer.
+
 ## What it does
 
 - **Roles.** Clerks enter invoices, Approvers approve up to $10,000, and Controllers approve anything, release payment runs and manage jobs.
