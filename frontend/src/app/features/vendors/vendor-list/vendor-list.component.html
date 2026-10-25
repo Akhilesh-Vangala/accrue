@@ -72,10 +72,10 @@
               <td class="num fw-semibold">{{ v.openBalance | currency: 'USD' }}</td>
               <td class="text-end text-nowrap">
                 @if (auth.canEnterInvoices()) {
-                  <button class="btn btn-sm btn-link" (click)="edit(v)" aria-label="Edit"><i class="bi bi-pencil"></i></button>
+                  <button class="btn btn-sm btn-outline-secondary" (click)="edit(v)" aria-label="Edit vendor" title="Edit"><i class="bi bi-pencil"></i></button>
                 }
                 @if (auth.isController()) {
-                  <button class="btn btn-sm btn-link" [class.text-danger]="v.isActive" (click)="toggleActive(v)">
+                  <button class="btn btn-sm ms-1" [class.btn-outline-danger]="v.isActive" [class.btn-outline-success]="!v.isActive" (click)="toggleActive(v)">
                     {{ v.isActive ? 'Deactivate' : 'Activate' }}
                   </button>
                 }

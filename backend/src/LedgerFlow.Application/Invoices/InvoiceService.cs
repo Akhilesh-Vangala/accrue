@@ -59,8 +59,11 @@ public sealed class InvoiceService(
     public async Task<IReadOnlyList<InvoiceSummaryDto>> ApprovalQueueAsync(CancellationToken ct)
     {
         var isController = user.Roles.Contains(Roles.Controller);
+        var email = user.Email;
         var queue = db.Invoices.AsNoTracking()
-            .Where(i => i.Status == InvoiceStatus.Submitted && i.CreatedBy != user.Email);
+            .Where(i => i.Status == InvoiceStatus.Submitted
+                && i.CreatedBy != email
+                && !i.Events.Any(e => Invoice.PreparationEvents.Contains(e.Type) && e.Actor == email));
         if (!isController)
         {
             queue = queue.Where(i => i.Total <= ApprovalPolicy.ApproverLimit);
@@ -145,7 +148,7 @@ public sealed class InvoiceService(
     }
 
     private async Task<Invoice> LoadAsync(int id, CancellationToken ct) =>
-        await db.Invoices.Include(i => i.Vendor).Include(i => i.Lines).SingleOrDefaultAsync(i => i.Id == id, ct)
+        await db.Invoices.Include(i => i.Vendor).Include(i => i.Lines).Include(i => i.Events).SingleOrDefaultAsync(i => i.Id == id, ct)
         ?? throw NotFoundException.For<Invoice>(id);
 
     private async Task EnsureNotDuplicateAsync(int vendorId, string invoiceNumber, int? exceptId, CancellationToken ct)
@@ -160,7 +163,7 @@ public sealed class InvoiceService(
     private List<string> AllowedActions(Invoice invoice)
     {
         var actions = new List<string>();
-        var isOwner = string.Equals(invoice.CreatedBy, user.Email, StringComparison.OrdinalIgnoreCase);
+        var isOwner = invoice.IsPreparedBy(user.Email);
         var isController = user.Roles.Contains(Roles.Controller);
         var canDecide = !isOwner && (isController || (user.Roles.Contains(Roles.Approver) && invoice.Total <= ApprovalPolicy.ApproverLimit));
 

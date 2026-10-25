@@ -130,6 +130,24 @@ body {
   font-weight: 500;
 }
 
+// Identifiers (tax IDs, job ids, cron expressions) read as data, not as Bootstrap's pink inline code.
+code {
+  color: var(--lf-ink-2);
+  background: #eef3f1;
+  padding: .1rem .35rem;
+  border-radius: .3rem;
+  font-size: .82em;
+}
+
+.table a:not(.btn) {
+  text-decoration: none;
+  font-weight: 600;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .toast-stack {
   position: fixed;
   right: 1rem;

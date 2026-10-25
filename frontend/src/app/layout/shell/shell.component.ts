@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { interval, startWith, switchMap } from 'rxjs';
+import { EMPTY, catchError, interval, startWith, switchMap } from 'rxjs';
 import { NotificationsApi } from '@core/api';
 import { AuthService } from '@core/auth';
 import { NotificationFeed, NotificationItem } from '@core/models';
@@ -48,10 +48,11 @@ export class ShellComponent implements OnInit {
     interval(30_000)
       .pipe(
         startWith(0),
-        switchMap(() => this.notificationsApi.feed()),
+        // A failed poll is skipped rather than ending the stream, so the feed recovers on the next tick.
+        switchMap(() => this.notificationsApi.feed().pipe(catchError(() => EMPTY))),
         takeUntilDestroyed(this.destroyRef),
       )
-      .subscribe({ next: feed => this.feed.set(feed), error: () => undefined });
+      .subscribe(feed => this.feed.set(feed));
   }
 
   open(item: NotificationItem): void {

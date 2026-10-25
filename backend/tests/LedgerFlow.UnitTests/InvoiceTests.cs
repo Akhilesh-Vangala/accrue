@@ -90,6 +90,30 @@ public class InvoiceTests
         Assert.Equal("segregation_of_duties", Assert.Throws<DomainException>(() => invoice.Reject(actor, "no", Now)).Code);
     }
 
+    [Fact]
+    public void Person_who_edited_or_submitted_the_invoice_cannot_decide_on_it()
+    {
+        var invoice = Invoice();
+        invoice.UpdateDraft(invoice.InvoiceDate, 0m, [new InvoiceLineInput("Paper", "6100", 1, 9_000m)], null, Controller, Now);
+        invoice.Submit(Approver, Now);
+
+        Assert.Equal("segregation_of_duties", Assert.Throws<DomainException>(() => invoice.Approve(Controller, ControllerRoles, null, Now)).Code);
+        Assert.Equal("segregation_of_duties", Assert.Throws<DomainException>(() => invoice.Approve(Approver, ApproverRoles, null, Now)).Code);
+
+        invoice.Approve("second.approver@ledgerflow.dev", ApproverRoles, null, Now);
+        Assert.Equal(InvoiceStatus.Approved, invoice.Status);
+    }
+
+    [Fact]
+    public void Editing_a_draft_keeps_the_vendor_payment_terms()
+    {
+        var invoice = Invoice(vendor: Vendor(termsDays: 45));
+
+        invoice.UpdateDraft(new DateOnly(2026, 9, 10), 0m, [new InvoiceLineInput("Paper", "6100", 1, 100m)], null, Clerk, Now);
+
+        Assert.Equal(new DateOnly(2026, 10, 25), invoice.DueDate);
+    }
+
     [Theory]
     [InlineData("")]
     [InlineData("   ")]

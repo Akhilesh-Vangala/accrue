@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http.Json;
 using LedgerFlow.Application.Invoices;
 using LedgerFlow.Application.Jobs;
 using LedgerFlow.Application.Notifications;
@@ -71,6 +72,25 @@ public class WorkflowTests(ApiFactory api)
 
         var response = await api.Controller.PostJsonAsync($"/api/invoices/{invoice.Summary.Id}/approve", new DecisionRequest(null));
 
+        Assert.Equal("segregation_of_duties", await response.ProblemCodeAsync(HttpStatusCode.Conflict));
+    }
+
+    [Fact]
+    public async Task Controller_who_edited_a_clerks_invoice_cannot_approve_it()
+    {
+        var vendor = await api.Clerk.AnyActiveVendorAsync();
+        var draft = await (await api.Clerk.PostJsonAsync("/api/invoices", Http.NewInvoice(vendor.Id, 700m)))
+            .ReadAsync<InvoiceDetailDto>(HttpStatusCode.Created);
+        var id = draft.Summary.Id;
+
+        var edit = Http.NewInvoice(vendor.Id, 9_500m, draft.Summary.InvoiceNumber) with { RowVersion = draft.RowVersion };
+        await (await api.Controller.PutAsJsonAsync($"/api/invoices/{id}", edit, ApiFactory.Json)).ShouldBeAsync(HttpStatusCode.OK);
+        await (await api.Clerk.PostJsonAsync($"/api/invoices/{id}/submit")).ShouldBeAsync(HttpStatusCode.OK);
+
+        var queue = await (await api.Controller.GetAsync("/api/invoices/approval-queue")).ReadAsync<List<InvoiceSummaryDto>>();
+        Assert.DoesNotContain(queue, i => i.Id == id);
+
+        var response = await api.Controller.PostJsonAsync($"/api/invoices/{id}/approve", new DecisionRequest(null));
         Assert.Equal("segregation_of_duties", await response.ProblemCodeAsync(HttpStatusCode.Conflict));
     }
 

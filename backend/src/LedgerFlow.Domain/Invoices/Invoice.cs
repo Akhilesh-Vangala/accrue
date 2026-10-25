@@ -9,6 +9,9 @@ namespace LedgerFlow.Domain.Invoices;
 /// </summary>
 public sealed class Invoice : Entity
 {
+    /// <summary>Events that make someone a preparer of the invoice; preparers may not decide on it.</summary>
+    public static readonly InvoiceEventType[] PreparationEvents = [InvoiceEventType.Created, InvoiceEventType.Updated, InvoiceEventType.Submitted];
+
     private readonly List<InvoiceLine> _lines = [];
     private readonly List<InvoiceEvent> _events = [];
 
@@ -90,8 +93,9 @@ public sealed class Invoice : Entity
     public void UpdateDraft(DateOnly invoiceDate, decimal taxAmount, IEnumerable<InvoiceLineInput> lines, string? notes, string actor, DateTimeOffset now)
     {
         EnsureStatus("invoice_not_editable", "Only draft or rejected invoices can be edited.", InvoiceStatus.Draft, InvoiceStatus.Rejected);
+        var termsDays = Vendor?.PaymentTermsDays ?? (DueDate.DayNumber - InvoiceDate.DayNumber);
         InvoiceDate = invoiceDate;
-        DueDate = invoiceDate.AddDays(Vendor?.PaymentTermsDays ?? (DueDate.DayNumber - InvoiceDate.DayNumber));
+        DueDate = invoiceDate.AddDays(termsDays);
         Notes = notes;
         SetLines(lines, taxAmount);
         Status = InvoiceStatus.Draft;
@@ -171,6 +175,13 @@ public sealed class Invoice : Entity
         Record(InvoiceEventType.Paid, actor, reference, now);
     }
 
+    /// <summary>
+    /// True when <paramref name="user"/> entered, edited or submitted this invoice. Requires <see cref="Events"/> to be loaded.
+    /// </summary>
+    public bool IsPreparedBy(string user) =>
+        string.Equals(CreatedBy, user, StringComparison.OrdinalIgnoreCase)
+        || _events.Any(e => PreparationEvents.Contains(e.Type) && string.Equals(e.Actor, user, StringComparison.OrdinalIgnoreCase));
+
     /// <summary>Re-evaluates the overdue flag. Returns true when the flag changed.</summary>
     public bool RefreshOverdue(DateOnly today, DateTimeOffset now)
     {
@@ -210,9 +221,9 @@ public sealed class Invoice : Entity
 
     private void EnsureSegregationOfDuties(string actor)
     {
-        if (string.Equals(CreatedBy, actor, StringComparison.OrdinalIgnoreCase))
+        if (IsPreparedBy(actor))
         {
-            throw new DomainException("segregation_of_duties", "The person who entered an invoice cannot approve or reject it.");
+            throw new DomainException("segregation_of_duties", "The person who entered, edited or submitted an invoice cannot approve or reject it.");
         }
     }
 
