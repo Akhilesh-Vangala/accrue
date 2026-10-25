@@ -4,9 +4,9 @@
 
 LedgerFlow is a full-stack accounts payable system that automates the invoice-to-payment cycle and builds audit-grade internal controls into the domain layer. Clerks can drop in a vendor's PDF and Claude reads it into a draft. Deterministic checks then re-verify every total, resolve the vendor and catch duplicates, and nothing is saved until a person reviews it. Every invoice is checked against segregation of duties, a $10,000 approver threshold and a duplicate-payment guard before money can move. Approved invoices are settled only through controller-released payment runs, which carry deterministic ACH remittance references. Five scheduled jobs flag overdue payables, snapshot AP aging, draft the weekly payment run and archive reports without manual effort. Every state transition is recorded in an append-only audit trail, which is the evidence internal audit asks for, and 95 automated tests plus a labeled extraction eval verify the system end to end.
 
-**Stack:** C# · ASP.NET Core (.NET 9) · EF Core · Azure SQL · Claude API (Anthropic C# SDK) · Hangfire · Telerik Reporting · Angular 17 · Bootstrap 5 · GitHub Actions · Azure DevOps · Bicep
+**Stack:** C# · ASP.NET Core (.NET 10 LTS) · EF Core · Azure SQL · Claude API (Anthropic C# SDK) · Hangfire · Telerik Reporting · Angular 22 · Bootstrap 5 · GitHub Actions · Azure DevOps · Bicep
 
-[Live demo](https://ledgerflow.vercel.app/) · [Demo accounts](docs/DEMO-ACCOUNTS.md)
+[Demo accounts](docs/DEMO-ACCOUNTS.md) · [Extraction eval](evals/invoice-extraction)
 
 ## At a glance
 
@@ -95,7 +95,7 @@ The `--oracle` mode replays the labels as a perfect reading. It checks the score
 ```mermaid
 flowchart LR
     subgraph Browser
-        SPA["Angular 17 SPA"]
+        SPA["Angular 22 SPA"]
         Viewer["Telerik HTML5 viewer"]
     end
     subgraph AppService["Azure App Service · single origin"]
@@ -245,11 +245,12 @@ Three reports are defined: AP aging, vendor spend and payment remittance. Each i
 - **API responses.** Unauthenticated calls return `401`/`403` instead of redirecting. Errors never expose stack traces.
 - **Headers.** `nosniff`, `X-Frame-Options: DENY` and a strict referrer policy. HSTS and HTTPS redirection are on outside development.
 - **Hangfire dashboard.** Restricted to authenticated Controllers.
+- **Dependencies.** NuGet audits every package, including transitive ones, as a build error. Patched versions of Newtonsoft.Json and System.Security.Cryptography.Pkcs are pinned centrally because Hangfire and SqlClient pull in vulnerable ones.
 - **Secrets.** User-secrets locally, pipeline variable groups in CI, a `@secure()` Bicep parameter, and a system-assigned managed identity on the web app.
 
 ## Frontend
 
-- **Framework.** Angular 17 standalone components with signals, built-in control flow and `OnPush` throughout. Every feature route is lazy loaded.
+- **Framework.** Angular 22 with standalone components, signals, built-in control flow and `OnPush` throughout. Every feature route is lazy loaded, and the initial bundle stays under its 700 KB budget (about 141 KB over the wire) by importing only the Bootstrap modules in use.
 - **Code structure.** `core/` holds typed API clients, auth state, guards, the interceptor and problem-details parsing. `shared/` holds reusable UI. `features/` has one folder per business area.
 - **Imports.** Only through the `@core`, `@shared`, `@features` and `@layout` aliases.
 - **UI.** Dashboard charts are dependency-free SVG, and the custom Bootstrap 5.3 theme uses tabular numerals for financial tables.
@@ -285,7 +286,7 @@ cd frontend && npm run test:ci         # 19 Angular
 
 ## Running locally
 
-Requires the .NET 9 SDK, Node 20 and Docker.
+Requires the .NET 10 SDK, Node 24 and Docker.
 
 ```bash
 docker compose up -d sql                              # SQL Server 2022

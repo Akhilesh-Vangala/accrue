@@ -54,7 +54,7 @@ stages:
     displayName: Build and test
     jobs:
       - job: BuildTest
-        displayName: .NET 9 + Angular 17
+        displayName: .NET 10 + Angular 22
         pool:
           vmImage: ubuntu-latest
         services:
@@ -70,9 +70,9 @@ stages:
               workingDirectory: backend
 
           - task: NodeTool@0
-            displayName: Install Node 20
+            displayName: Install Node 24
             inputs:
-              versionSpec: 20.x
+              versionSpec: 24.x
 
           - task: Cache@2
             displayName: Cache NuGet packages
