@@ -1,0 +1,37 @@
+name: Extraction eval
+
+# Runs the labeled invoice set through the Claude reader and uploads the scorecard.
+# Manual only: every run makes paid model calls. Requires the ANTHROPIC_API_KEY repository secret.
+on:
+  workflow_dispatch:
+    inputs:
+      model:
+        description: Model id
+        default: claude-opus-5-5
+      effort:
+        description: Effort (low, medium, high, xhigh, max)
+        default: medium
+
+permissions:
+  contents: read
+
+jobs:
+  eval:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+      - name: Run eval
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: >-
+          dotnet run --project backend/tools/LedgerFlow.ExtractionEval -c Release --
+          --model "${{ inputs.model }}" --effort "${{ inputs.effort }}" --out "${{ runner.temp }}/eval"
+      - name: Scorecard
+        run: cat "${{ runner.temp }}"/eval/*.md >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: extraction-eval
+          path: ${{ runner.temp }}/eval

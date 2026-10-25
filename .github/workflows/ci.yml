@@ -1,0 +1,62 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    name: .NET build and tests
+    runs-on: ubuntu-latest
+    services:
+      sql:
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        env:
+          ACCEPT_EULA: "Y"
+          MSSQL_SA_PASSWORD: LedgerFlow!Ci2026
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'LedgerFlow!Ci2026' -Q 'SELECT 1' || exit 1"
+          --health-interval 10s --health-timeout 5s --health-retries 12 --health-start-period 20s
+    env:
+      LEDGERFLOW_TEST_SQL: Server=localhost,1433;User Id=sa;Password=LedgerFlow!Ci2026;TrustServerCertificate=True;Encrypt=True
+      DOTNET_NOLOGO: "true"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: backend/global.json
+      - name: Build (warnings as errors)
+        run: dotnet build backend/LedgerFlow.sln -c Release
+      - name: Unit and integration tests
+        run: dotnet test backend/LedgerFlow.sln -c Release --no-build --logger "trx" --results-directory TestResults
+      - name: Extraction eval harness self-check (oracle)
+        run: dotnet run --project backend/tools/LedgerFlow.ExtractionEval -c Release --no-build -- --oracle --out ${{ runner.temp }}/eval
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dotnet-test-results
+          path: TestResults
+
+  frontend:
+    name: Angular tests and build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: frontend/.nvmrc
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run test:ci
+      - run: npx ng build

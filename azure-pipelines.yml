@@ -4,6 +4,7 @@
 #   1. Service connection (Azure Resource Manager) named in `azureServiceConnection`.
 #   2. Variable group `ledgerflow-secrets` (Pipelines > Library) with secret variables:
 #        SqlAdminPassword       Azure SQL admin password used by infra/main.bicep
+#        AnthropicApiKey        Claude API key for invoice document extraction (empty string disables it)
 #        TelerikNugetKey        Telerik NuGet API key (only when UseTelerik = true)
 #        TelerikLicenseKey      Telerik license key (only when UseTelerik = true)
 #   3. Environment named `ledgerflow-dev` (add an approval check for gated deploys).
@@ -187,12 +188,13 @@ stages:
                       outputs=$(az deployment group create \
                         -g "$(resourceGroup)" \
                         -f "$(Pipeline.Workspace)/infra/main.bicep" \
-                        -p environment=dev sqlAdminLogin="$(sqlAdminLogin)" sqlAdminPassword="$SQL_ADMIN_PASSWORD" \
+                        -p environment=dev sqlAdminLogin="$(sqlAdminLogin)" sqlAdminPassword="$SQL_ADMIN_PASSWORD" anthropicApiKey="$ANTHROPIC_API_KEY" \
                         --query properties.outputs -o json)
                       echo "##vso[task.setvariable variable=webAppName;isOutput=true]$(echo "$outputs" | jq -r .webAppName.value)"
                       echo "##vso[task.setvariable variable=webAppUrl;isOutput=true]$(echo "$outputs" | jq -r .webAppUrl.value)"
                   env:
                     SQL_ADMIN_PASSWORD: $(SqlAdminPassword)
+                    ANTHROPIC_API_KEY: $(AnthropicApiKey)
 
                 - task: AzureWebApp@1
                   displayName: Deploy to App Service (Windows)

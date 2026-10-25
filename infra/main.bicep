@@ -21,7 +21,7 @@ param environment string = 'dev'
 
 param location string = resourceGroup().location
 
-@description('SQL administrator login. The app connects with this login; see README for moving to a managed identity.')
+@description('SQL administrator login the app connects with.')
 param sqlAdminLogin string
 
 @secure()
@@ -43,6 +43,10 @@ param appServiceSku string = 'B1'
 
 @description('Seed demo users, vendors and invoices on first start.')
 param seedDemoData bool = true
+
+@secure()
+@description('Anthropic API key for invoice document extraction. Empty hides the import option.')
+param anthropicApiKey string = ''
 
 @description('Expose the OpenAPI document and Scalar UI outside Development.')
 param enableApiReference bool = true
@@ -162,6 +166,10 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
         {
           name: 'OpenApi__Enabled'
           value: string(enableApiReference)
+        }
+        {
+          name: 'Anthropic__ApiKey'
+          value: anthropicApiKey
         }
       ]
       connectionStrings: [
