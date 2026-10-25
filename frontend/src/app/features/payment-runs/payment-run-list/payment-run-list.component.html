@@ -17,7 +17,7 @@
             <tr [routerLink]="['/payment-runs', r.id]">
               <td class="fw-semibold">{{ r.name }}</td>
               <td>{{ r.paymentDate | date: 'EEE, MMM d, y' }}</td>
-              <td><lf-status [status]="r.status" /></td>
+              <td><ac-status [status]="r.status" /></td>
               <td class="num">{{ r.paymentCount }}</td>
               <td class="num fw-semibold">{{ r.total | currency: 'USD' }}</td>
               <td class="small text-muted-2">{{ r.releasedBy ?? (r.status === 'Draft' ? 'Awaiting release' : '') }}</td>
@@ -29,6 +29,6 @@
       </table>
     </div>
   } @else {
-    <lf-loading />
+    <ac-loading />
   }
 </div>

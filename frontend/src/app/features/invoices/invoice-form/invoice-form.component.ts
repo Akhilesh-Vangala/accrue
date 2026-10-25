@@ -20,7 +20,7 @@ type LineForm = FormGroup<{
 }>;
 
 @Component({
-  selector: 'lf-invoice-form',
+  selector: 'ac-invoice-form',
   imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, LoadingComponent, InvoiceImportComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-form.component.html',

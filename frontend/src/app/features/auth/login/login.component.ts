@@ -3,10 +3,10 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '@core/auth';
 
-const DEMO_PASSWORD = 'LedgerFlow!2026';
+const DEMO_PASSWORD = 'Accrue!2026';
 
 @Component({
-  selector: 'lf-login',
+  selector: 'ac-login',
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.component.html',
@@ -20,9 +20,9 @@ export class LoginComponent {
   readonly busy = signal(false);
   readonly error = signal<string | null>(null);
   readonly demos = [
-    { role: 'AP clerk', email: 'clerk@ledgerflow.dev', icon: 'bi-pencil-square' },
-    { role: 'Approver', email: 'approver@ledgerflow.dev', icon: 'bi-check2-circle' },
-    { role: 'Controller', email: 'controller@ledgerflow.dev', icon: 'bi-shield-check' },
+    { role: 'AP clerk', email: 'clerk@accrue.dev', icon: 'bi-pencil-square' },
+    { role: 'Approver', email: 'approver@accrue.dev', icon: 'bi-check2-circle' },
+    { role: 'Controller', email: 'controller@accrue.dev', icon: 'bi-shield-check' },
   ];
 
   readonly form = inject(FormBuilder).nonNullable.group({

@@ -46,11 +46,11 @@ $enable-shadows: false;
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
 :root {
-  --lf-ink: #0c1a15;
-  --lf-ink-2: #12251e;
-  --lf-mint: #34d399;
-  --lf-muted: #6b7a74;
-  --lf-line: #e3e9e6;
+  --ac-ink: #0c1a15;
+  --ac-ink-2: #12251e;
+  --ac-mint: #34d399;
+  --ac-muted: #6b7a74;
+  --ac-line: #e3e9e6;
 }
 
 body {
@@ -64,7 +64,7 @@ body {
 }
 
 .text-muted-2 {
-  color: var(--lf-muted) !important;
+  color: var(--ac-muted) !important;
 }
 
 .page-title {
@@ -84,13 +84,13 @@ body {
 }
 
 .card {
-  border-color: var(--lf-line);
+  border-color: var(--ac-line);
   box-shadow: 0 1px 2px rgba(12, 26, 21, .04);
 }
 
 .card-header {
   background: transparent;
-  border-bottom-color: var(--lf-line);
+  border-bottom-color: var(--ac-line);
   font-weight: 600;
 }
 
@@ -102,7 +102,7 @@ body {
     font-size: .72rem;
     text-transform: uppercase;
     letter-spacing: .06em;
-    color: var(--lf-muted);
+    color: var(--ac-muted);
     font-weight: 600;
     border-bottom-width: 1px;
     white-space: nowrap;
@@ -118,7 +118,7 @@ body {
     font-size: .75rem;
     text-transform: uppercase;
     letter-spacing: .06em;
-    color: var(--lf-muted);
+    color: var(--ac-muted);
     font-weight: 600;
   }
 
@@ -131,7 +131,7 @@ body {
 
   .kpi-sub {
     font-size: .8rem;
-    color: var(--lf-muted);
+    color: var(--ac-muted);
   }
 }
 
@@ -150,7 +150,7 @@ body {
 .empty {
   padding: 2.5rem 1rem;
   text-align: center;
-  color: var(--lf-muted);
+  color: var(--ac-muted);
 }
 
 .btn {
@@ -159,7 +159,7 @@ body {
 
 // Identifiers (tax IDs, job ids, cron expressions) read as data, not as Bootstrap's pink inline code.
 code {
-  color: var(--lf-ink-2);
+  color: var(--ac-ink-2);
   background: #eef3f1;
   padding: .1rem .35rem;
   border-radius: .3rem;

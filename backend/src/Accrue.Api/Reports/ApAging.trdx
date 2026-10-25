@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report DataSourceName="agingData" Width="7.5in" Name="ApAging" xmlns="http://schemas.telerik.com/reporting/2021/1.0">
+  <DataSources>
+    <SqlDataSource ConnectionString="Accrue" ProviderName="Microsoft.Data.SqlClient" Name="agingData"
+      SelectCommand="SELECT VendorName, InvoiceNumber, InvoiceDate, DueDate, Status, DaysPastDue, Bucket, BucketOrder, Outstanding FROM dbo.vw_ApAging ORDER BY BucketOrder, VendorName, DueDate" />
+  </DataSources>
+  <Items>
+    <PageHeaderSection Height="0.9in" Name="pageHeader">
+      <Items>
+        <TextBox Value="Accrue" Left="0in" Top="0in" Width="3in" Height="0.3in" Name="brand">
+          <Style Color="0, 128, 96"><Font Size="11pt" Bold="True" /></Style>
+        </TextBox>
+        <TextBox Value="Accounts payable aging" Left="0in" Top="0.3in" Width="5in" Height="0.4in" Name="title">
+          <Style><Font Size="18pt" Bold="True" /></Style>
+        </TextBox>
+        <TextBox Value="= 'As of ' + Format('{0:MMM d, yyyy}', Now())" Left="5in" Top="0.35in" Width="2.5in" Height="0.3in" Name="asOf">
+          <Style TextAlign="Right" Color="Gray" />
+        </TextBox>
+      </Items>
+    </PageHeaderSection>
+    <ReportHeaderSection Height="0.8in" Name="summary">
+      <Items>
+        <TextBox Value="Open invoices" Left="0in" Top="0.05in" Width="2.4in" Height="0.25in" Name="countLabel">
+          <Style Color="Gray"><Font Size="8pt" /></Style>
+        </TextBox>
+        <TextBox Value="= Count(Fields.InvoiceNumber)" Left="0in" Top="0.3in" Width="2.4in" Height="0.4in" Name="countValue">
+          <Style><Font Size="16pt" Bold="True" /></Style>
+        </TextBox>
+        <TextBox Value="Total outstanding" Left="2.5in" Top="0.05in" Width="2.4in" Height="0.25in" Name="totalLabel">
+          <Style Color="Gray"><Font Size="8pt" /></Style>
+        </TextBox>
+        <TextBox Value="= Sum(Fields.Outstanding)" Format="{0:C2}" Left="2.5in" Top="0.3in" Width="2.4in" Height="0.4in" Name="totalValue">
+          <Style><Font Size="16pt" Bold="True" /></Style>
+        </TextBox>
+        <TextBox Value="Past due" Left="5in" Top="0.05in" Width="2.5in" Height="0.25in" Name="pastDueLabel">
+          <Style Color="Gray"><Font Size="8pt" /></Style>
+        </TextBox>
+        <TextBox Value="= Sum(IIf(Fields.DaysPastDue &gt; 0, Fields.Outstanding, 0))" Format="{0:C2}" Left="5in" Top="0.3in" Width="2.5in" Height="0.4in" Name="pastDueValue">
+          <Style Color="192, 57, 43"><Font Size="16pt" Bold="True" /></Style>
+        </TextBox>
+      </Items>
+    </ReportHeaderSection>
+    <DetailSection Height="0.25in" Name="detail">
+      <Items>
+        <TextBox Value="= Fields.VendorName" Left="0in" Top="0in" Width="2.3in" Height="0.25in" Name="vendor" />
+        <TextBox Value="= Fields.InvoiceNumber" Left="2.3in" Top="0in" Width="1.4in" Height="0.25in" Name="invoice" />
+        <TextBox Value="= Fields.InvoiceDate" Format="{0:yyyy-MM-dd}" Left="3.7in" Top="0in" Width="1in" Height="0.25in" Name="invoiceDate" />
+        <TextBox Value="= Fields.DueDate" Format="{0:yyyy-MM-dd}" Left="4.7in" Top="0in" Width="1in" Height="0.25in" Name="dueDate" />
+        <TextBox Value="= Fields.DaysPastDue" Left="5.7in" Top="0in" Width="0.6in" Height="0.25in" Name="days">
+          <Style TextAlign="Right" />
+        </TextBox>
+        <TextBox Value="= Fields.Outstanding" Format="{0:C2}" Left="6.3in" Top="0in" Width="1.2in" Height="0.25in" Name="amount">
+          <Style TextAlign="Right" />
+        </TextBox>
+      </Items>
+    </DetailSection>
+    <PageFooterSection Height="0.35in" Name="pageFooter">
+      <Items>
+        <TextBox Value="= 'Page ' + PageNumber + ' of ' + PageCount" Left="5in" Top="0.05in" Width="2.5in" Height="0.25in" Name="pageNumber">
+          <Style TextAlign="Right" Color="Gray"><Font Size="8pt" /></Style>
+        </TextBox>
+        <TextBox Value="Source: dbo.vw_ApAging" Left="0in" Top="0.05in" Width="3in" Height="0.25in" Name="source">
+          <Style Color="Gray"><Font Size="8pt" /></Style>
+        </TextBox>
+      </Items>
+    </PageFooterSection>
+  </Items>
+  <Groups>
+    <Group Name="bucketGroup">
+      <GroupHeader>
+        <GroupHeaderSection Height="0.55in" Name="bucketHeader">
+          <Items>
+            <TextBox Value="= Fields.Bucket + IIf(Fields.BucketOrder = 0, '', ' days past due')" Left="0in" Top="0.05in" Width="4in" Height="0.25in" Name="bucketTitle">
+              <Style Color="0, 128, 96"><Font Size="11pt" Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="Vendor" Left="0in" Top="0.3in" Width="2.3in" Height="0.22in" Name="hVendor">
+              <Style Color="Gray"><Font Size="8pt" Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="Invoice" Left="2.3in" Top="0.3in" Width="1.4in" Height="0.22in" Name="hInvoice">
+              <Style Color="Gray"><Font Size="8pt" Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="Invoice date" Left="3.7in" Top="0.3in" Width="1in" Height="0.22in" Name="hInvoiceDate">
+              <Style Color="Gray"><Font Size="8pt" Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="Due" Left="4.7in" Top="0.3in" Width="1in" Height="0.22in" Name="hDue">
+              <Style Color="Gray"><Font Size="8pt" Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="Days" Left="5.7in" Top="0.3in" Width="0.6in" Height="0.22in" Name="hDays">
+              <Style TextAlign="Right" Color="Gray"><Font Size="8pt" Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="Outstanding" Left="6.3in" Top="0.3in" Width="1.2in" Height="0.22in" Name="hAmount">
+              <Style TextAlign="Right" Color="Gray"><Font Size="8pt" Bold="True" /></Style>
+            </TextBox>
+          </Items>
+        </GroupHeaderSection>
+      </GroupHeader>
+      <GroupFooter>
+        <GroupFooterSection Height="0.35in" Name="bucketFooter">
+          <Items>
+            <TextBox Value="= Fields.Bucket + ' subtotal (' + Count(Fields.InvoiceNumber) + ' invoices)'" Left="2.3in" Top="0.05in" Width="4in" Height="0.25in" Name="subtotalLabel">
+              <Style TextAlign="Right"><Font Bold="True" /></Style>
+            </TextBox>
+            <TextBox Value="= Sum(Fields.Outstanding)" Format="{0:C2}" Left="6.3in" Top="0.05in" Width="1.2in" Height="0.25in" Name="subtotal">
+              <Style TextAlign="Right"><Font Bold="True" /></Style>
+            </TextBox>
+          </Items>
+        </GroupFooterSection>
+      </GroupFooter>
+      <Groupings>
+        <Grouping Expression="= Fields.BucketOrder" />
+      </Groupings>
+      <Sortings>
+        <Sorting Expression="= Fields.BucketOrder" Direction="Asc" />
+      </Sortings>
+    </Group>
+  </Groups>
+  <PageSettings PaperKind="Letter" Landscape="False">
+    <Margins>
+      <MarginsU Left="0.5in" Right="0.5in" Top="0.5in" Bottom="0.5in" />
+    </Margins>
+  </PageSettings>
+  <StyleSheet>
+    <StyleRule>
+      <Style>
+        <Font Name="Segoe UI" Size="9pt" />
+      </Style>
+      <Selectors>
+        <TypeSelector Type="TextItemBase" />
+      </Selectors>
+    </StyleRule>
+  </StyleSheet>
+</Report>

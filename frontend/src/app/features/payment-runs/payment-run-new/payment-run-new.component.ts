@@ -10,7 +10,7 @@ import { LoadingComponent } from '@shared/ui';
 import { isoDate } from '@shared/utils';
 
 @Component({
-  selector: 'lf-payment-run-new',
+  selector: 'ac-payment-run-new',
   imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-run-new.component.html',

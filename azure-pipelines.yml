@@ -1,13 +1,13 @@
-# LedgerFlow CI/CD for Azure DevOps Pipelines.
+# Accrue CI/CD for Azure DevOps Pipelines.
 #
 # One-time setup (Project settings):
 #   1. Service connection (Azure Resource Manager) named in `azureServiceConnection`.
-#   2. Variable group `ledgerflow-secrets` (Pipelines > Library) with secret variables:
+#   2. Variable group `accrue-secrets` (Pipelines > Library) with secret variables:
 #        SqlAdminPassword       Azure SQL admin password used by infra/main.bicep
 #        AnthropicApiKey        Claude API key for invoice document extraction (empty string disables it)
 #        TelerikNugetKey        Telerik NuGet API key (only when UseTelerik = true)
 #        TelerikLicenseKey      Telerik license key (only when UseTelerik = true)
-#   3. Environment named `ledgerflow-dev` (add an approval check for gated deploys).
+#   3. Environment named `accrue-dev` (add an approval check for gated deploys).
 #
 # Without Telerik credentials the pipeline builds the CSV reporting fallback; set UseTelerik to true once the trial feed is configured.
 
@@ -22,22 +22,22 @@ pr:
     include: [main]
 
 variables:
-  - group: ledgerflow-secrets
+  - group: accrue-secrets
   - name: buildConfiguration
     value: Release
   - name: UseTelerik
     value: false
   - name: azureServiceConnection
-    value: ledgerflow-azure
+    value: accrue-azure
   - name: resourceGroup
-    value: rg-ledgerflow-dev
+    value: rg-accrue-dev
   - name: location
     value: eastus2
   - name: sqlAdminLogin
-    value: ledgerflowadmin
+    value: accrueadmin
   # Throwaway password for the CI-only SQL Server container; it never leaves the agent.
   - name: ciSqlPassword
-    value: Ci-LedgerFlow!2026
+    value: Ci-Accrue!2026
 
 resources:
   containers:
@@ -86,14 +86,14 @@ stages:
               key: 'npm | "$(Agent.OS)" | frontend/package-lock.json'
               path: $(npm_config_cache)
 
-          - script: dotnet restore LedgerFlow.sln -p:UseTelerik=$(UseTelerik)
+          - script: dotnet restore Accrue.sln -p:UseTelerik=$(UseTelerik)
             displayName: dotnet restore
             workingDirectory: backend
             env:
               TELERIK_NUGET_USER: api-key
               TELERIK_NUGET_KEY: $(TelerikNugetKey)
 
-          - script: dotnet build LedgerFlow.sln -c $(buildConfiguration) --no-restore -p:UseTelerik=$(UseTelerik)
+          - script: dotnet build Accrue.sln -c $(buildConfiguration) --no-restore -p:UseTelerik=$(UseTelerik)
             displayName: dotnet build (warnings are errors)
             workingDirectory: backend
             env:
@@ -108,13 +108,13 @@ stages:
             displayName: Wait for SQL Server container
 
           - script: >
-              dotnet test LedgerFlow.sln -c $(buildConfiguration) --no-build
+              dotnet test Accrue.sln -c $(buildConfiguration) --no-build
               --logger trx --results-directory $(Agent.TempDirectory)/tests
               --collect "XPlat Code Coverage"
             displayName: dotnet test (unit + integration)
             workingDirectory: backend
             env:
-              LEDGERFLOW_TEST_SQL: Server=127.0.0.1,1433;User Id=sa;Password=$(ciSqlPassword);TrustServerCertificate=True;Encrypt=True
+              ACCRUE_TEST_SQL: Server=127.0.0.1,1433;User Id=sa;Password=$(ciSqlPassword);TrustServerCertificate=True;Encrypt=True
 
           - task: PublishTestResults@2
             displayName: Publish test results
@@ -138,11 +138,11 @@ stages:
             workingDirectory: frontend
 
           - script: npx ng build --configuration production
-            displayName: Angular build into backend/src/LedgerFlow.Api/wwwroot
+            displayName: Angular build into backend/src/Accrue.Api/wwwroot
             workingDirectory: frontend
 
           - script: >
-              dotnet publish backend/src/LedgerFlow.Api/LedgerFlow.Api.csproj -c $(buildConfiguration) --no-restore
+              dotnet publish backend/src/Accrue.Api/Accrue.Api.csproj -c $(buildConfiguration) --no-restore
               -p:UseTelerik=$(UseTelerik) -o $(Build.ArtifactStagingDirectory)/api
             displayName: dotnet publish
             env:
@@ -153,9 +153,9 @@ stages:
             inputs:
               rootFolderOrFile: $(Build.ArtifactStagingDirectory)/api
               includeRootFolder: false
-              archiveFile: $(Build.ArtifactStagingDirectory)/ledgerflow.zip
+              archiveFile: $(Build.ArtifactStagingDirectory)/accrue.zip
 
-          - publish: $(Build.ArtifactStagingDirectory)/ledgerflow.zip
+          - publish: $(Build.ArtifactStagingDirectory)/accrue.zip
             artifact: app
 
           - publish: infra
@@ -170,7 +170,7 @@ stages:
         displayName: Provision and deploy
         pool:
           vmImage: ubuntu-latest
-        environment: ledgerflow-dev
+        environment: accrue-dev
         strategy:
           runOnce:
             deploy:
@@ -184,7 +184,7 @@ stages:
                     scriptLocation: inlineScript
                     inlineScript: |
                       set -euo pipefail
-                      az group create -n "$(resourceGroup)" -l "$(location)" --tags application=LedgerFlow -o none
+                      az group create -n "$(resourceGroup)" -l "$(location)" --tags application=Accrue -o none
                       outputs=$(az deployment group create \
                         -g "$(resourceGroup)" \
                         -f "$(Pipeline.Workspace)/infra/main.bicep" \
@@ -202,7 +202,7 @@ stages:
                     azureSubscription: $(azureServiceConnection)
                     appType: webApp
                     appName: $(infra.webAppName)
-                    package: $(Pipeline.Workspace)/app/ledgerflow.zip
+                    package: $(Pipeline.Workspace)/app/accrue.zip
                     deploymentMethod: zipDeploy
 
                 - script: |

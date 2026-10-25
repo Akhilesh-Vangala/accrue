@@ -5,7 +5,7 @@ import { ShellComponent } from '@layout/shell/shell.component';
 
 /** Top-level routes. Each feature is lazy loaded; multi-page features own their child routes. */
 export const routes: Routes = [
-  { path: 'login', component: LoginComponent, title: 'Sign in · LedgerFlow' },
+  { path: 'login', component: LoginComponent, title: 'Sign in · Accrue' },
   {
     path: '',
     component: ShellComponent,
@@ -14,7 +14,7 @@ export const routes: Routes = [
       { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
       {
         path: 'dashboard',
-        title: 'Dashboard · LedgerFlow',
+        title: 'Dashboard · Accrue',
         loadComponent: () => import('@features/dashboard/dashboard.component').then(m => m.DashboardComponent),
       },
       {
@@ -23,7 +23,7 @@ export const routes: Routes = [
       },
       {
         path: 'approvals',
-        title: 'Approvals · LedgerFlow',
+        title: 'Approvals · Accrue',
         canActivate: [roleGuard('Approver', 'Controller')],
         loadComponent: () => import('@features/approvals/approval-queue/approval-queue.component').then(m => m.ApprovalQueueComponent),
       },
@@ -33,17 +33,17 @@ export const routes: Routes = [
       },
       {
         path: 'vendors',
-        title: 'Vendors · LedgerFlow',
+        title: 'Vendors · Accrue',
         loadComponent: () => import('@features/vendors/vendor-list/vendor-list.component').then(m => m.VendorListComponent),
       },
       {
         path: 'reports',
-        title: 'Reports · LedgerFlow',
+        title: 'Reports · Accrue',
         loadComponent: () => import('@features/reports/report-center/report-center.component').then(m => m.ReportCenterComponent),
       },
       {
         path: 'jobs',
-        title: 'Background jobs · LedgerFlow',
+        title: 'Background jobs · Accrue',
         canActivate: [roleGuard('Controller')],
         loadComponent: () => import('@features/jobs/job-list/job-list.component').then(m => m.JobListComponent),
       },

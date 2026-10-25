@@ -6,7 +6,7 @@
 </div>
 
 @if (loading()) {
-  <lf-loading />
+  <ac-loading />
 } @else {
   <form [formGroup]="form" (ngSubmit)="save(false)" novalidate>
     @if (error()) {
@@ -16,7 +16,7 @@
     <div class="row g-3">
       <div class="col-lg-8">
         @if (extraction(); as caps) {
-          <lf-invoice-import [capabilities]="caps" (extracted)="applyExtraction($event)" />
+          <ac-invoice-import [capabilities]="caps" (extracted)="applyExtraction($event)" />
         }
         <div class="card mb-3">
           <div class="card-header">Invoice details</div>

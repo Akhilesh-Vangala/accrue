@@ -12,7 +12,7 @@ import { ReportViewerComponent } from '../report-viewer/report-viewer.component'
  * (paging, export to PDF/Excel/Word, print). Without it, the same datasets download as CSV.
  */
 @Component({
-  selector: 'lf-report-center',
+  selector: 'ac-report-center',
   imports: [DatePipe, DecimalPipe, FormsModule, LoadingComponent, ReportViewerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './report-center.component.html',

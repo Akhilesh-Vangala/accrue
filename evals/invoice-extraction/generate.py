@@ -179,7 +179,7 @@ def draw(case: Case, path: Path) -> None:
     c.setFont(bold, 9)
     c.drawString(0.75 * inch, y, "BILL TO")
     c.setFont(body, 9)
-    for i, text in enumerate(["LedgerFlow Inc. — Accounts Payable", "ap@ledgerflow.dev", "Tax ID 99-0000001"]):
+    for i, text in enumerate(["Accrue Inc. — Accounts Payable", "ap@accrue.dev", "Tax ID 99-0000001"]):
         c.drawString(0.75 * inch, y - 12 * (i + 1), text)
 
     meta = [("Invoice No.", case.number), ("Invoice date", fmt(case.issued)), ("Due date", fmt(due)), ("Terms", f"Net {case.terms}")]

@@ -27,7 +27,7 @@ jobs:
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         run: >-
-          dotnet run --project backend/tools/LedgerFlow.ExtractionEval -c Release --
+          dotnet run --project backend/tools/Accrue.ExtractionEval -c Release --
           --model "${{ inputs.model }}" --effort "${{ inputs.effort }}" --out "${{ runner.temp }}/eval"
       - name: Scorecard
         run: cat "${{ runner.temp }}"/eval/*.md >> "$GITHUB_STEP_SUMMARY"

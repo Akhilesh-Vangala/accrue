@@ -52,7 +52,7 @@
               <td>{{ i.vendorName }}</td>
               <td class="text-nowrap">{{ i.invoiceDate | date: 'MMM d, y' }}</td>
               <td class="text-nowrap" [class.text-danger]="i.isOverdue">{{ i.dueDate | date: 'MMM d, y' }}</td>
-              <td class="text-nowrap"><lf-status [status]="i.status" [overdue]="i.isOverdue" /></td>
+              <td class="text-nowrap"><ac-status [status]="i.status" [overdue]="i.isOverdue" /></td>
               <td class="num">{{ i.total | currency: 'USD' }}</td>
               <td class="num fw-semibold">{{ i.outstanding | currency: 'USD' }}</td>
             </tr>
@@ -62,8 +62,8 @@
         </tbody>
       </table>
     </div>
-    <lf-pager [page]="r.page" [pageSize]="r.pageSize" [total]="r.totalCount" (pageChange)="apply({ page: $event }, false)" />
+    <ac-pager [page]="r.page" [pageSize]="r.pageSize" [total]="r.totalCount" (pageChange)="apply({ page: $event }, false)" />
   } @else {
-    <lf-loading />
+    <ac-loading />
   }
 </div>

@@ -7,7 +7,7 @@ import { ToastService } from '@core/toast';
 import { LoadingComponent } from '@shared/ui';
 
 @Component({
-  selector: 'lf-job-list',
+  selector: 'ac-job-list',
   imports: [DatePipe, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-list.component.html',

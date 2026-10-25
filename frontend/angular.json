@@ -37,13 +37,13 @@
       },
       "root": "",
       "sourceRoot": "src",
-      "prefix": "lf",
+      "prefix": "ac",
       "architect": {
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": {
-              "base": "../backend/src/LedgerFlow.Api/wwwroot",
+              "base": "../backend/src/Accrue.Api/wwwroot",
               "browser": ""
             },
             "index": "src/index.html",

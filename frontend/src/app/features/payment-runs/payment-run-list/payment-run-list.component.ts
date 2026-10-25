@@ -7,7 +7,7 @@ import { PaymentRunSummary } from '@core/models';
 import { LoadingComponent, StatusBadgeComponent } from '@shared/ui';
 
 @Component({
-  selector: 'lf-payment-run-list',
+  selector: 'ac-payment-run-list',
   imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadgeComponent, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-run-list.component.html',

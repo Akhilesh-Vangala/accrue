@@ -87,8 +87,8 @@
         </tbody>
       </table>
     </div>
-    <lf-pager [page]="r.page" [pageSize]="r.pageSize" [total]="r.totalCount" (pageChange)="load($event)" />
+    <ac-pager [page]="r.page" [pageSize]="r.pageSize" [total]="r.totalCount" (pageChange)="load($event)" />
   } @else {
-    <lf-loading />
+    <ac-loading />
   }
 </div>

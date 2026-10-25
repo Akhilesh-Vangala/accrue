@@ -9,7 +9,7 @@ import { LoadingComponent } from '@shared/ui';
 const BUCKET_COLORS = ['#10b981', '#f59e0b', '#f97316', '#ef4444', '#991b1b'];
 
 @Component({
-  selector: 'lf-dashboard',
+  selector: 'ac-dashboard',
   imports: [CurrencyPipe, DecimalPipe, DatePipe, RouterLink, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dashboard.component.html',

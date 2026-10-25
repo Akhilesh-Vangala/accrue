@@ -26,7 +26,7 @@
               <td>{{ i.vendorName }}</td>
               <td class="small">{{ i.createdBy }}</td>
               <td [class.text-danger]="i.isOverdue">{{ i.dueDate | date: 'MMM d, y' }}</td>
-              <td><lf-status [status]="i.status" [overdue]="i.isOverdue" /></td>
+              <td><ac-status [status]="i.status" [overdue]="i.isOverdue" /></td>
               <td class="num fw-semibold">{{ i.total | currency: 'USD' }}</td>
             </tr>
           } @empty {
@@ -36,6 +36,6 @@
       </table>
     </div>
   } @else {
-    <lf-loading />
+    <ac-loading />
   }
 </div>

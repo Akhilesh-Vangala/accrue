@@ -10,7 +10,7 @@ import { ToastService } from '@core/toast';
 import { LoadingComponent, PagerComponent } from '@shared/ui';
 
 @Component({
-  selector: 'lf-vendor-list',
+  selector: 'ac-vendor-list',
   imports: [CurrencyPipe, FormsModule, ReactiveFormsModule, RouterLink, LoadingComponent, PagerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './vendor-list.component.html',

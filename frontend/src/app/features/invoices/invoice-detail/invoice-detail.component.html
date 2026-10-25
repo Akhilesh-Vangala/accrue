@@ -4,7 +4,7 @@
       <a class="small text-decoration-none" routerLink="/invoices"><i class="bi bi-arrow-left"></i> Invoices</a>
       <h1 class="page-title d-flex align-items-center gap-2 flex-wrap">
         {{ inv.summary.invoiceNumber }}
-        <lf-status [status]="inv.summary.status" [overdue]="inv.summary.isOverdue" />
+        <ac-status [status]="inv.summary.status" [overdue]="inv.summary.isOverdue" />
       </h1>
       <div class="text-muted-2 small">{{ inv.summary.vendorName }}</div>
     </div>
@@ -114,5 +114,5 @@
     </div>
   </div>
 } @else {
-  <lf-loading />
+  <ac-loading />
 }

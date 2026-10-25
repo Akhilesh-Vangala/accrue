@@ -1,4 +1,4 @@
-# LedgerFlow
+# Accrue
 
 Accounts payable system covering the invoice-to-payment lifecycle.
 - **LLM ingestion.** Vendor documents go through Claude with schema-constrained output. A deterministic reconciliation layer then recomputes every amount, resolves vendor identity and detects duplicate payments before a human-reviewed draft is created.
@@ -7,7 +7,7 @@ Accounts payable system covering the invoice-to-payment lifecycle.
 
 **Stack:** C# · ASP.NET Core (.NET 10 LTS) · EF Core 10 · Azure SQL · Anthropic C# SDK · Hangfire · Telerik Reporting · Angular 22 · GitHub Actions · Azure DevOps · Bicep
 
-[CI](https://github.com/Akhilesh-Vangala/ledgerflow/actions/workflows/ci.yml) · [Demo accounts](docs/DEMO-ACCOUNTS.md) · [Extraction eval](evals/invoice-extraction)
+[CI](https://github.com/Akhilesh-Vangala/accrue/actions/workflows/ci.yml) · [Demo accounts](docs/DEMO-ACCOUNTS.md) · [Extraction eval](evals/invoice-extraction)
 
 | | |
 | --- | --- |
@@ -64,7 +64,7 @@ flowchart LR
 
 Every invoice carries a bill-to block with the customer's own tax ID, to test vendor/customer disambiguation.
 
-`backend/tools/LedgerFlow.ExtractionEval` runs the production reader and checks over the set and reports:
+`backend/tools/Accrue.ExtractionEval` runs the production reader and checks over the set and reports:
 - Document exact-match rate.
 - Per-field accuracy.
 - Line-item and GL accuracy.
@@ -76,8 +76,8 @@ Every invoice carries a bill-to block with the customer's own tax ID, to test ve
 `--oracle` replays the labels as a perfect reading to validate the scorer, the labels and the checks, at zero model cost. It runs in CI on every push.
 
 ```bash
-dotnet run --project backend/tools/LedgerFlow.ExtractionEval -- --oracle
-ANTHROPIC_API_KEY=... dotnet run --project backend/tools/LedgerFlow.ExtractionEval -- --model claude-opus-5-5 --effort medium
+dotnet run --project backend/tools/Accrue.ExtractionEval -- --oracle
+ANTHROPIC_API_KEY=... dotnet run --project backend/tools/Accrue.ExtractionEval -- --model claude-opus-5-5 --effort medium
 ```
 
 ## Architecture
@@ -107,7 +107,7 @@ flowchart LR
 | Layer | Responsibility |
 | --- | --- |
 | `Domain` | Aggregates, invariants, `ApprovalPolicy`. No framework dependencies. |
-| `Application` | Use-case services, FluentValidation, SQL-projected read models, job bodies, extraction reconciliation. Persistence only through `ILedgerFlowDb`. |
+| `Application` | Use-case services, FluentValidation, SQL-projected read models, job bodies, extraction reconciliation. Persistence only through `IAccrueDb`. |
 | `Infrastructure` | EF Core (`DbContext`, configurations, migrations, audit interceptor), Identity, the Hangfire adapter, and the Claude and Telerik adapters. |
 | `Api` | Composition root, controllers, auth, rate limiting, exception → problem-details mapping, OpenAPI, health checks. |
 
@@ -175,7 +175,7 @@ stateDiagram-v2
 ## Build, test, deploy
 
 ```bash
-dotnet test backend/LedgerFlow.sln     # 52 unit + 24 integration (WebApplicationFactory, ephemeral SQL Server DB)
+dotnet test backend/Accrue.sln     # 52 unit + 24 integration (WebApplicationFactory, ephemeral SQL Server DB)
 cd frontend && npm run test:ci         # 19 Angular (Karma, headless Chrome)
 ```
 
@@ -194,7 +194,7 @@ Requires the .NET 10 SDK, Node 24 and Docker.
 
 ```bash
 docker compose up -d sql
-dotnet run --project backend/src/LedgerFlow.Api       # migrates, seeds, starts Hangfire → :5076 (/scalar, /hangfire)
+dotnet run --project backend/src/Accrue.Api       # migrates, seeds, starts Hangfire → :5076 (/scalar, /hangfire)
 cd frontend && npm ci && npm start                    # → :4200
 ```
 

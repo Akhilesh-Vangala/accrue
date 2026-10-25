@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Accrue.Infrastructure</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
+    <PackageReference Include="Hangfire.Core" />
+    <PackageReference Include="Hangfire.SqlServer" />
+    <PackageReference Include="Anthropic" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(UseTelerik)' == 'true'">
+    <PackageReference Include="Telerik.Reporting$(TelerikPackageSuffix)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Accrue.Application\Accrue.Application.csproj" />
+  </ItemGroup>
+
+</Project>

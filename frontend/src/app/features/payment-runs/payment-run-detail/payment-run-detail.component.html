@@ -2,7 +2,7 @@
   <div class="page-head">
     <div>
       <a class="small text-decoration-none" routerLink="/payment-runs"><i class="bi bi-arrow-left"></i> Payment runs</a>
-      <h1 class="page-title d-flex gap-2 align-items-center">{{ r.summary.name }} <lf-status [status]="r.summary.status" /></h1>
+      <h1 class="page-title d-flex gap-2 align-items-center">{{ r.summary.name }} <ac-status [status]="r.summary.status" /></h1>
       <div class="text-muted-2 small">
         Paying {{ r.summary.paymentDate | date: 'EEEE, MMM d, y' }}
         @if (r.summary.releasedBy) { · released by {{ r.summary.releasedBy }} {{ r.summary.releasedAt | date: 'MMM d, h:mm a' }} }
@@ -41,5 +41,5 @@
     </div>
   </div>
 } @else {
-  <lf-loading />
+  <ac-loading />
 }

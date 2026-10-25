@@ -49,15 +49,15 @@
 
       @if (c.interactiveViewer && viewerSource(); as source) {
         @defer {
-          <lf-report-viewer [source]="source" />
+          <ac-report-viewer [source]="source" />
         } @loading (minimum 200ms) {
-          <lf-loading />
+          <ac-loading />
         }
       }
     </div>
   }
 } @else {
-  <lf-loading />
+  <ac-loading />
 }
 
 <div class="card">
@@ -82,6 +82,6 @@
       </table>
     </div>
   } @else {
-    <lf-loading />
+    <ac-loading />
   }
 </div>

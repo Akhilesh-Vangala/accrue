@@ -1,3 +1,0 @@
-namespace LedgerFlow.Api.Controllers;
-
-public sealed record TriggeredJobDto(string RecurringJobId, string BackgroundJobId);

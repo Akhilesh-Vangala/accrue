@@ -18,14 +18,14 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
           ACCEPT_EULA: "Y"
-          MSSQL_SA_PASSWORD: LedgerFlow!Ci2026
+          MSSQL_SA_PASSWORD: Accrue!Ci2026
         ports:
           - 1433:1433
         options: >-
-          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'LedgerFlow!Ci2026' -Q 'SELECT 1' || exit 1"
+          --health-cmd "/opt/mssql-tools18/bin/sqlcmd -C -S localhost -U sa -P 'Accrue!Ci2026' -Q 'SELECT 1' || exit 1"
           --health-interval 10s --health-timeout 5s --health-retries 12 --health-start-period 20s
     env:
-      LEDGERFLOW_TEST_SQL: Server=localhost,1433;User Id=sa;Password=LedgerFlow!Ci2026;TrustServerCertificate=True;Encrypt=True
+      ACCRUE_TEST_SQL: Server=localhost,1433;User Id=sa;Password=Accrue!Ci2026;TrustServerCertificate=True;Encrypt=True
       DOTNET_NOLOGO: "true"
     steps:
       - uses: actions/checkout@v7
@@ -33,11 +33,11 @@ jobs:
         with:
           global-json-file: backend/global.json
       - name: Build (warnings as errors)
-        run: dotnet build backend/LedgerFlow.sln -c Release
+        run: dotnet build backend/Accrue.sln -c Release
       - name: Unit and integration tests
-        run: dotnet test backend/LedgerFlow.sln -c Release --no-build --logger "trx" --results-directory TestResults
+        run: dotnet test backend/Accrue.sln -c Release --no-build --logger "trx" --results-directory TestResults
       - name: Extraction eval harness self-check (oracle)
-        run: dotnet run --project backend/tools/LedgerFlow.ExtractionEval -c Release --no-build -- --oracle --out ${{ runner.temp }}/eval
+        run: dotnet run --project backend/tools/Accrue.ExtractionEval -c Release --no-build -- --oracle --out ${{ runner.temp }}/eval
       - uses: actions/upload-artifact@v7
         if: always()
         with:

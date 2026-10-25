@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, input, output } from '@an
 
 /** Previous/next pager for server-side paged lists. */
 @Component({
-  selector: 'lf-pager',
+  selector: 'ac-pager',
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './pager.component.html',
 })

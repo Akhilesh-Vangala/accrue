@@ -12,7 +12,7 @@ coverage*.xml
 frontend/node_modules/
 frontend/.angular/
 frontend/dist/
-backend/src/LedgerFlow.Api/wwwroot/
+backend/src/Accrue.Api/wwwroot/
 
 # Local secrets and tooling
 .env

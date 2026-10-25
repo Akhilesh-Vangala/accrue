@@ -1,4 +1,4 @@
-// API contracts mirrored from LedgerFlow.Application. Dates arrive as ISO strings.
+// API contracts mirrored from Accrue.Application. Dates arrive as ISO strings.
 export * from './auth.model';
 export * from './api.model';
 export * from './vendor.model';

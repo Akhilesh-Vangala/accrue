@@ -7,7 +7,7 @@ import { blockingFindings } from './extraction-mapping';
 
 /** Upload a vendor invoice and hand the extracted draft to the form. The user still reviews and saves. */
 @Component({
-  selector: 'lf-invoice-import',
+  selector: 'ac-invoice-import',
   imports: [DecimalPipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-import.component.html',

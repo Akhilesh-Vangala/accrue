@@ -4,6 +4,6 @@ Seeded by the API for local development. Do not use these credentials in product
 
 | Role | Email | Password |
 | --- | --- | --- |
-| Clerk | clerk@ledgerflow.dev | LedgerFlow!2026 |
-| Approver | approver@ledgerflow.dev | LedgerFlow!2026 |
-| Controller | controller@ledgerflow.dev | LedgerFlow!2026 |
+| Clerk | clerk@accrue.dev | Accrue!2026 |
+| Approver | approver@accrue.dev | Accrue!2026 |
+| Controller | controller@accrue.dev | Accrue!2026 |

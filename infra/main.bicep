@@ -1,16 +1,16 @@
-// LedgerFlow on Azure: one Windows App Service (API + Angular from wwwroot + Hangfire server and dashboard)
+// Accrue on Azure: one Windows App Service (API + Angular from wwwroot + Hangfire server and dashboard)
 // backed by one Azure SQL database (application tables, reporting views and Hangfire storage).
 //
 // Deploy into an existing resource group:
-//   az deployment group create -g rg-ledgerflow -f infra/main.bicep \
-//     -p sqlAdminLogin=ledgerflowadmin sqlAdminPassword='<strong password>'
+//   az deployment group create -g rg-accrue -f infra/main.bicep \
+//     -p sqlAdminLogin=accrueadmin sqlAdminPassword='<strong password>'
 
 targetScope = 'resourceGroup'
 
 @description('Short name used to derive resource names.')
 @minLength(3)
 @maxLength(12)
-param appName string = 'ledgerflow'
+param appName string = 'accrue'
 
 @description('Deployment environment suffix, e.g. dev or prod.')
 @allowed([
@@ -59,7 +59,7 @@ var names = {
   database: 'sqldb-${appName}'
 }
 var tags = {
-  application: 'LedgerFlow'
+  application: 'Accrue'
   environment: environment
 }
 
@@ -174,7 +174,7 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
       ]
       connectionStrings: [
         {
-          name: 'LedgerFlow'
+          name: 'Accrue'
           type: 'SQLAzure'
           connectionString: sqlConnectionString
         }

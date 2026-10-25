@@ -10,7 +10,7 @@ import { InvoiceQuery, InvoiceStatus, InvoiceSummary, Paged } from '@core/models
 import { LoadingComponent, PagerComponent, StatusBadgeComponent } from '@shared/ui';
 
 @Component({
-  selector: 'lf-invoice-list',
+  selector: 'ac-invoice-list',
   imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, StatusBadgeComponent, PagerComponent, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-list.component.html',

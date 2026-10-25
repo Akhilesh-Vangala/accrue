@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-  selector: 'lf-loading',
+  selector: 'ac-loading',
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="d-flex align-items-center justify-content-center gap-2 py-5 text-muted-2">

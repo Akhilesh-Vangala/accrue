@@ -8,7 +8,7 @@ export interface ViewerSource {
 
 /** Wraps the Telerik viewer so the reports page can @defer it; it pulls in jQuery and ~2 MB of viewer code. */
 @Component({
-  selector: 'lf-report-viewer',
+  selector: 'ac-report-viewer',
   imports: [TelerikReportingModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './report-viewer.component.html',

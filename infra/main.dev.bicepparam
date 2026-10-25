@@ -1,9 +1,9 @@
 using 'main.bicep'
 
-param appName = 'ledgerflow'
+param appName = 'accrue'
 param environment = 'dev'
-param sqlAdminLogin = 'ledgerflowadmin'
-param sqlAdminPassword = readEnvironmentVariable('LEDGERFLOW_SQL_PASSWORD')
+param sqlAdminLogin = 'accrueadmin'
+param sqlAdminPassword = readEnvironmentVariable('ACCRUE_SQL_PASSWORD')
 param useSqlFreeOffer = true
 param appServiceSku = 'B1'
 param seedDemoData = true

@@ -9,7 +9,7 @@ describe('AuthService', () => {
   let auth: AuthService;
   let backend: HttpTestingController;
 
-  const approver: Me = { email: 'approver@ledgerflow.dev', displayName: 'Marcus Lee', roles: ['Approver'] };
+  const approver: Me = { email: 'approver@accrue.dev', displayName: 'Marcus Lee', roles: ['Approver'] };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -23,11 +23,11 @@ describe('AuthService', () => {
 
   it('signs in with a cookie session and loads the profile', () => {
     let signedIn: Me | null = null;
-    auth.login('approver@ledgerflow.dev', 'secret').subscribe(me => (signedIn = me));
+    auth.login('approver@accrue.dev', 'secret').subscribe(me => (signedIn = me));
 
     const login = backend.expectOne(r => r.url === '/api/auth/login');
     expect(login.request.params.get('useCookies')).toBe('true');
-    expect(login.request.body).toEqual({ email: 'approver@ledgerflow.dev', password: 'secret' });
+    expect(login.request.body).toEqual({ email: 'approver@accrue.dev', password: 'secret' });
     login.flush({});
     backend.expectOne('/api/auth/me').flush(approver);
 
