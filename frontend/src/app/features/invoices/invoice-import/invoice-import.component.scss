@@ -1,0 +1,53 @@
+.dropzone {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 84px;
+  border: 1.5px dashed #b9c9c2;
+  border-radius: .6rem;
+  background: #f8fbfa;
+  color: var(--lf-muted);
+  cursor: pointer;
+  text-align: center;
+  padding: 1rem;
+  transition: border-color .15s, background .15s;
+
+  &:hover,
+  &.dragging {
+    border-color: var(--bs-primary);
+    background: #eef8f4;
+  }
+
+  &.busy {
+    cursor: progress;
+  }
+}
+
+.findings {
+  display: grid;
+  gap: .35rem;
+}
+
+.finding {
+  display: flex;
+  gap: .5rem;
+  align-items: baseline;
+  font-size: .85rem;
+  padding: .45rem .65rem;
+  border-radius: .45rem;
+}
+
+.finding-error {
+  background: #fdecec;
+  color: #a51d1d;
+}
+
+.finding-warning {
+  background: #fff6e5;
+  color: #8a5300;
+}
+
+.finding-info {
+  background: #eef3f1;
+  color: var(--lf-ink-2);
+}

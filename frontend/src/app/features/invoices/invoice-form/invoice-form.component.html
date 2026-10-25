@@ -15,12 +15,15 @@
 
     <div class="row g-3">
       <div class="col-lg-8">
+        @if (extraction(); as caps) {
+          <lf-invoice-import [capabilities]="caps" (extracted)="applyExtraction($event)" />
+        }
         <div class="card mb-3">
           <div class="card-header">Invoice details</div>
           <div class="card-body row g-3">
             <div class="col-md-6">
               <label class="form-label" for="vendor">Vendor</label>
-              <select id="vendor" class="form-select" formControlName="vendorId" [class.is-invalid]="invalid('vendorId')">
+              <select id="vendor" class="form-select" formControlName="vendorId" [class.is-invalid]="invalid('vendorId')" [class.needs-review]="isFlagged('vendorId')">
                 <option [ngValue]="0" disabled>Select a vendor</option>
                 @for (v of vendors(); track v.id) {
                   <option [ngValue]="v.id">{{ v.name }}</option>
@@ -33,20 +36,20 @@
             <div class="col-md-6">
               <label class="form-label" for="number">Vendor invoice #</label>
               <input id="number" class="form-control" formControlName="invoiceNumber"
-                     [class.is-invalid]="invalid('invoiceNumber') || errors()['invoiceNumber']" />
+                     [class.is-invalid]="invalid('invoiceNumber') || errors()['invoiceNumber']" [class.needs-review]="isFlagged('invoiceNumber')" />
               <div class="form-text">Duplicates for the same vendor are blocked.</div>
             </div>
             <div class="col-md-6">
               <label class="form-label" for="date">Invoice date</label>
               <input id="date" type="date" class="form-control" formControlName="invoiceDate"
-                     [class.is-invalid]="invalid('invoiceDate') || errors()['invoiceDate']" />
+                     [class.is-invalid]="invalid('invoiceDate') || errors()['invoiceDate']" [class.needs-review]="isFlagged('invoiceDate')" />
               @for (m of errors()['invoiceDate'] ?? []; track m) { <div class="invalid-feedback d-block">{{ m }}</div> }
             </div>
             <div class="col-md-6">
               <label class="form-label" for="tax">Tax</label>
               <div class="input-group">
                 <span class="input-group-text">$</span>
-                <input id="tax" type="number" step="0.01" min="0" class="form-control" formControlName="taxAmount" [class.is-invalid]="invalid('taxAmount')" />
+                <input id="tax" type="number" step="0.01" min="0" class="form-control" formControlName="taxAmount" [class.is-invalid]="invalid('taxAmount')" [class.needs-review]="isFlagged('taxAmount')" />
               </div>
             </div>
             <div class="col-12">
@@ -66,7 +69,7 @@
               <thead><tr><th style="min-width:220px">Description</th><th style="width:110px">GL</th><th style="width:110px">Qty</th><th style="width:150px">Unit price</th><th class="num">Amount</th><th></th></tr></thead>
               <tbody>
                 @for (line of lines.controls; track line; let i = $index) {
-                  <tr [formGroupName]="i">
+                  <tr [formGroupName]="i" [class.needs-review-row]="isFlagged('lines.' + i) || isFlagged('lines')">
                     <td><input class="form-control form-control-sm" formControlName="description" [class.is-invalid]="invalid('lines.' + i + '.description')" /></td>
                     <td><input class="form-control form-control-sm" formControlName="glAccount" maxlength="4" [class.is-invalid]="invalid('lines.' + i + '.glAccount')" /></td>
                     <td><input type="number" step="0.01" class="form-control form-control-sm" formControlName="quantity" [class.is-invalid]="invalid('lines.' + i + '.quantity')" /></td>

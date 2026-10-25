@@ -157,3 +157,13 @@ code {
   gap: .5rem;
   width: min(380px, calc(100vw - 2rem));
 }
+
+// Fields an imported document left uncertain, or that a check flagged, until the reviewer touches them.
+.needs-review:not(.is-invalid) {
+  border-color: var(--bs-warning);
+  box-shadow: 0 0 0 .15rem rgba(217, 119, 6, .15);
+}
+
+.needs-review-row > td:first-child {
+  box-shadow: inset 3px 0 0 var(--bs-warning);
+}

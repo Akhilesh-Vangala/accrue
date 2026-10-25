@@ -5,10 +5,12 @@ import { FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Va
 import { Router, RouterLink } from '@angular/router';
 import { InvoicesApi, VendorsApi } from '@core/api';
 import { describeError, fieldErrors } from '@core/http';
-import { InvoiceLine, SaveInvoice, Vendor } from '@core/models';
+import { ExtractionCapabilities, InvoiceExtraction, InvoiceLine, SaveInvoice, Vendor } from '@core/models';
 import { ToastService } from '@core/toast';
 import { LoadingComponent } from '@shared/ui';
 import { isoDate } from '@shared/utils';
+import { flaggedFields } from '../invoice-import/extraction-mapping';
+import { InvoiceImportComponent } from '../invoice-import/invoice-import.component';
 
 type LineForm = FormGroup<{
   description: FormControl<string>;
@@ -20,7 +22,7 @@ type LineForm = FormGroup<{
 @Component({
   selector: 'lf-invoice-form',
   standalone: true,
-  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, LoadingComponent],
+  imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, LoadingComponent, InvoiceImportComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-form.component.html',
 })
@@ -39,6 +41,8 @@ export class InvoiceFormComponent implements OnInit {
   readonly saving = signal(false);
   readonly error = signal<string | null>(null);
   readonly errors = signal<Partial<Record<string, string[]>>>({});
+  readonly extraction = signal<ExtractionCapabilities | null>(null);
+  readonly flagged = signal<Set<string>>(new Set());
   private rowVersion: string | null = null;
 
   readonly form = this.fb.group({
@@ -68,6 +72,7 @@ export class InvoiceFormComponent implements OnInit {
     this.vendorsApi.list({ pageSize: 100 }).subscribe(r => this.vendors.set(r.items));
     const id = this.id();
     if (!id) {
+      this.invoicesApi.extractionCapabilities().subscribe({ next: caps => this.extraction.set(caps.enabled ? caps : null), error: () => undefined });
       this.addLine();
       this.loading.set(false);
       return;
@@ -97,6 +102,26 @@ export class InvoiceFormComponent implements OnInit {
         unitPrice: [line?.unitPrice ?? 0, [Validators.required, Validators.min(0)]],
       }),
     );
+  }
+
+  /** Replaces the form with an extracted draft. Nothing is saved; flagged fields are highlighted for review. */
+  applyExtraction({ extraction, fileName }: { extraction: InvoiceExtraction; fileName: string }): void {
+    const draft = extraction.draft;
+    this.lines.clear();
+    (draft.lines.length > 0 ? draft.lines : [undefined]).forEach(l => this.addLine(l));
+    this.form.patchValue({
+      vendorId: draft.vendorId ?? 0,
+      invoiceNumber: draft.invoiceNumber ?? '',
+      invoiceDate: draft.invoiceDate ?? isoDate(new Date()),
+      taxAmount: draft.taxAmount,
+      notes: `Imported from ${fileName}.`,
+    });
+    this.flagged.set(flaggedFields(extraction));
+    this.form.markAllAsTouched();
+  }
+
+  isFlagged(path: string): boolean {
+    return this.flagged().has(path);
   }
 
   removeLine(index: number): void {
