@@ -28,8 +28,8 @@ jobs:
       LEDGERFLOW_TEST_SQL: Server=localhost,1433;User Id=sa;Password=LedgerFlow!Ci2026;TrustServerCertificate=True;Encrypt=True
       DOTNET_NOLOGO: "true"
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v6
         with:
           global-json-file: backend/global.json
       - name: Build (warnings as errors)
@@ -38,7 +38,7 @@ jobs:
         run: dotnet test backend/LedgerFlow.sln -c Release --no-build --logger "trx" --results-directory TestResults
       - name: Extraction eval harness self-check (oracle)
         run: dotnet run --project backend/tools/LedgerFlow.ExtractionEval -c Release --no-build -- --oracle --out ${{ runner.temp }}/eval
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: dotnet-test-results
@@ -51,8 +51,8 @@ jobs:
       run:
         working-directory: frontend
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
         with:
           node-version-file: frontend/.nvmrc
           cache: npm
