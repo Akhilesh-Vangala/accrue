@@ -20,6 +20,7 @@
     <PackageVersion Include="Hangfire.Core" Version="$(HangfireVersion)" />
     <PackageVersion Include="Hangfire.SqlServer" Version="$(HangfireVersion)" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="$(HangfireVersion)" />
+    <PackageVersion Include="Anthropic" Version="13.3.0" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.18.0" />
     <PackageVersion Include="Telerik.Reporting$(TelerikPackageSuffix)" Version="$(TelerikVersion)" />

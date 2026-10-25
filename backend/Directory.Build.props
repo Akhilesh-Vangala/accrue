@@ -13,7 +13,7 @@
 
   <!--
     Telerik Reporting ships from Telerik's private NuGet feed (https://nuget.telerik.com/v3/index.json).
-    Build with -p:UseTelerik=true once the feed credentials are configured (see README, "Telerik Reporting").
+    Build with -p:UseTelerik=true once the feed credentials are configured (see README, "Reporting").
     TelerikPackageSuffix is ".Trial" for the 30-day trial and empty for a licensed install.
   -->
   <PropertyGroup>

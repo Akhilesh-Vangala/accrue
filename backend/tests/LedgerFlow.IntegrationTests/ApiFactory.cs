@@ -2,9 +2,11 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using LedgerFlow.Application.Extraction;
 using LedgerFlow.Infrastructure.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -35,6 +37,8 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
             InitialCatalog = $"LedgerFlow_Tests_{Guid.NewGuid():N}",
         }.ConnectionString;
     }
+
+    public FakeInvoiceDocumentReader Reader { get; } = new();
 
     public HttpClient Clerk => _clients["clerk"];
 
@@ -75,6 +79,7 @@ public sealed class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         builder.UseSetting("Database:MigrateOnStartup", "true");
         builder.UseSetting("Database:Seed", "true");
         builder.UseSetting("Hangfire:ServerEnabled", "false");
+        builder.ConfigureTestServices(services => services.AddSingleton<IInvoiceDocumentReader>(Reader));
     }
 
     private async Task<HttpClient> SignInAsync(string email)

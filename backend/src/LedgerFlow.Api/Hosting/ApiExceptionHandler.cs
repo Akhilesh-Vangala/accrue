@@ -19,6 +19,11 @@ public sealed partial class ApiExceptionHandler(IProblemDetailsService problemDe
             ValidationException validation => Validation(validation),
             DomainException domain => Problem(StatusCodes.Status409Conflict, "Business rule violated", domain.Message, domain.Code),
             NotFoundException notFound => Problem(StatusCodes.Status404NotFound, "Not found", notFound.Message, "not_found"),
+            ExternalServiceException external => Problem(
+                external.Retryable ? StatusCodes.Status503ServiceUnavailable : StatusCodes.Status502BadGateway,
+                "Upstream service error",
+                external.Message,
+                external.Code),
             DbUpdateConcurrencyException => Problem(
                 StatusCodes.Status409Conflict,
                 "Edit conflict",

@@ -10,6 +10,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" />
     <PackageReference Include="Hangfire.Core" />
     <PackageReference Include="Hangfire.SqlServer" />
+    <PackageReference Include="Anthropic" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(UseTelerik)' == 'true'">

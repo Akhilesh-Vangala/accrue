@@ -1,5 +1,8 @@
+using Anthropic;
 using LedgerFlow.Application.Abstractions;
+using LedgerFlow.Application.Extraction;
 using LedgerFlow.Application.Reporting;
+using LedgerFlow.Infrastructure.Extraction;
 using LedgerFlow.Infrastructure.Identity;
 using LedgerFlow.Infrastructure.Jobs;
 using LedgerFlow.Infrastructure.Persistence;
@@ -38,6 +41,19 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<LedgerFlowDbContext>();
 
         services.AddScoped<IJobScheduler, HangfireJobScheduler>();
+
+        var extraction = configuration.GetSection(ClaudeExtractionOptions.Section).Get<ClaudeExtractionOptions>() ?? new ClaudeExtractionOptions();
+        extraction.ApiKey ??= Environment.GetEnvironmentVariable("ANTHROPIC_API_KEY");
+        if (string.IsNullOrWhiteSpace(extraction.ApiKey))
+        {
+            services.AddSingleton<IInvoiceDocumentReader, UnavailableInvoiceDocumentReader>();
+        }
+        else
+        {
+            services.AddSingleton(extraction);
+            services.AddSingleton(new AnthropicClient { ApiKey = extraction.ApiKey, Timeout = TimeSpan.FromSeconds(extraction.TimeoutSeconds) });
+            services.AddSingleton<IInvoiceDocumentReader, ClaudeInvoiceDocumentReader>();
+        }
 
         services.AddSingleton(new ReportingOptions());
 #if TELERIK

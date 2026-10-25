@@ -1,5 +1,6 @@
 using FluentValidation;
 using LedgerFlow.Application.Dashboard;
+using LedgerFlow.Application.Extraction;
 using LedgerFlow.Application.Invoices;
 using LedgerFlow.Application.Jobs;
 using LedgerFlow.Application.Notifications;
@@ -23,6 +24,7 @@ public static class DependencyInjection
         services.AddScoped<NotificationService>();
         services.AddScoped<ReportService>();
         services.AddScoped<CsvReportRenderer>();
+        services.AddScoped<InvoiceExtractionService>();
 
         services.AddScoped<OverdueInvoiceJob>();
         services.AddScoped<PaymentReminderJob>();
