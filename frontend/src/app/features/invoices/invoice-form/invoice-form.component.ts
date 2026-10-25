@@ -21,7 +21,6 @@ type LineForm = FormGroup<{
 
 @Component({
   selector: 'lf-invoice-form',
-  standalone: true,
   imports: [ReactiveFormsModule, RouterLink, CurrencyPipe, LoadingComponent, InvoiceImportComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-form.component.html',

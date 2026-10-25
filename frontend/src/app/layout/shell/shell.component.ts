@@ -17,7 +17,6 @@ interface NavItem {
 
 @Component({
   selector: 'lf-shell',
-  standalone: true,
   imports: [RouterOutlet, RouterLink, RouterLinkActive, DatePipe],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './shell.component.html',

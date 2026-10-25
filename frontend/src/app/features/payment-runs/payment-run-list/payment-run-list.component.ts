@@ -8,7 +8,6 @@ import { LoadingComponent, StatusBadgeComponent } from '@shared/ui';
 
 @Component({
   selector: 'lf-payment-run-list',
-  standalone: true,
   imports: [CurrencyPipe, DatePipe, RouterLink, StatusBadgeComponent, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-run-list.component.html',

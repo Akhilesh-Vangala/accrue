@@ -13,7 +13,6 @@ import { ReportViewerComponent } from '../report-viewer/report-viewer.component'
  */
 @Component({
   selector: 'lf-report-center',
-  standalone: true,
   imports: [DatePipe, DecimalPipe, FormsModule, LoadingComponent, ReportViewerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './report-center.component.html',

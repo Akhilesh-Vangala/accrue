@@ -8,7 +8,6 @@ import { LoadingComponent } from '@shared/ui';
 
 @Component({
   selector: 'lf-job-list',
-  standalone: true,
   imports: [DatePipe, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './job-list.component.html',

@@ -7,7 +7,6 @@ const DEMO_PASSWORD = 'LedgerFlow!2026';
 
 @Component({
   selector: 'lf-login',
-  standalone: true,
   imports: [ReactiveFormsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './login.component.html',

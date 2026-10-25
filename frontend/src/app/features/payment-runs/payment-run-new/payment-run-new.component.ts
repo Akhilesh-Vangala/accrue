@@ -11,7 +11,6 @@ import { isoDate } from '@shared/utils';
 
 @Component({
   selector: 'lf-payment-run-new',
-  standalone: true,
   imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './payment-run-new.component.html',

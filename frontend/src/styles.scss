@@ -15,7 +15,34 @@ $table-cell-padding-x: .75rem;
 $card-border-color: #e3e9e6;
 $enable-shadows: false;
 
-@import "bootstrap/scss/bootstrap";
+// Only the Bootstrap parts the app uses (no modals, dropdowns, tooltips, carousels, ...), which keeps the initial CSS small.
+// Bootstrap 5.3 is built on Sass @import; angular.json silences that one deprecation until Bootstrap ships Sass modules.
+@import "bootstrap/scss/functions";
+@import "bootstrap/scss/variables";
+@import "bootstrap/scss/variables-dark";
+@import "bootstrap/scss/maps";
+@import "bootstrap/scss/mixins";
+@import "bootstrap/scss/utilities";
+@import "bootstrap/scss/root";
+@import "bootstrap/scss/reboot";
+@import "bootstrap/scss/type";
+@import "bootstrap/scss/images";
+@import "bootstrap/scss/containers";
+@import "bootstrap/scss/grid";
+@import "bootstrap/scss/tables";
+@import "bootstrap/scss/forms";
+@import "bootstrap/scss/buttons";
+@import "bootstrap/scss/transitions";
+@import "bootstrap/scss/button-group";
+@import "bootstrap/scss/nav";
+@import "bootstrap/scss/card";
+@import "bootstrap/scss/badge";
+@import "bootstrap/scss/alert";
+@import "bootstrap/scss/list-group";
+@import "bootstrap/scss/close";
+@import "bootstrap/scss/spinners";
+@import "bootstrap/scss/helpers";
+@import "bootstrap/scss/utilities/api";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
 :root {

@@ -11,7 +11,6 @@ import { LoadingComponent, PagerComponent, StatusBadgeComponent } from '@shared/
 
 @Component({
   selector: 'lf-invoice-list',
-  standalone: true,
   imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, StatusBadgeComponent, PagerComponent, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-list.component.html',

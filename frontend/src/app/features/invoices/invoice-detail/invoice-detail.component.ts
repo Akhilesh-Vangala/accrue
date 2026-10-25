@@ -22,7 +22,6 @@ const EVENT_ICON: Record<string, string> = {
 
 @Component({
   selector: 'lf-invoice-detail',
-  standalone: true,
   imports: [CurrencyPipe, DatePipe, FormsModule, RouterLink, StatusBadgeComponent, LoadingComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './invoice-detail.component.html',

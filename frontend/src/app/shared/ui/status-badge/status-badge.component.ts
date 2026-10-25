@@ -15,7 +15,6 @@ const STATUS_CLASS: Record<InvoiceStatus | PaymentRunStatus, string> = {
 /** Colored status pill with an optional overdue marker. */
 @Component({
   selector: 'lf-status',
-  standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <span class="badge badge-status {{ css() }}">{{ status() }}</span>

@@ -8,7 +8,6 @@ import { LoadingComponent, StatusBadgeComponent } from '@shared/ui';
 
 @Component({
   selector: 'lf-approval-queue',
-  standalone: true,
   imports: [CurrencyPipe, DatePipe, RouterLink, LoadingComponent, StatusBadgeComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './approval-queue.component.html',
