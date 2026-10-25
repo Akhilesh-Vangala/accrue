@@ -1,7 +1,5 @@
 # LedgerFlow
 
-[![CI](https://github.com/Akhilesh-Vangala/ledgerflow/actions/workflows/ci.yml/badge.svg)](https://github.com/Akhilesh-Vangala/ledgerflow/actions/workflows/ci.yml)
-
 Accounts payable system covering the invoice-to-payment lifecycle.
 - **LLM ingestion.** Vendor documents go through Claude with schema-constrained output. A deterministic reconciliation layer then recomputes every amount, resolves vendor identity and detects duplicate payments before a human-reviewed draft is created.
 - **Domain core.** Approval and payment invariants are enforced at the aggregate level: segregation of duties, role-scoped approval limits and controller-gated settlement.
@@ -9,7 +7,7 @@ Accounts payable system covering the invoice-to-payment lifecycle.
 
 **Stack:** C# · ASP.NET Core (.NET 10 LTS) · EF Core 10 · Azure SQL · Anthropic C# SDK · Hangfire · Telerik Reporting · Angular 22 · GitHub Actions · Azure DevOps · Bicep
 
-[Demo accounts](docs/DEMO-ACCOUNTS.md) · [Extraction eval](evals/invoice-extraction)
+[CI](https://github.com/Akhilesh-Vangala/ledgerflow/actions/workflows/ci.yml) · [Demo accounts](docs/DEMO-ACCOUNTS.md) · [Extraction eval](evals/invoice-extraction)
 
 | | |
 | --- | --- |
