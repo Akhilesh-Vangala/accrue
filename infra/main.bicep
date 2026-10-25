@@ -133,7 +133,7 @@ resource site 'Microsoft.Web/sites@2023-12-01' = {
     httpsOnly: true
     clientAffinityEnabled: false
     siteConfig: {
-      netFrameworkVersion: 'v9.0'
+      netFrameworkVersion: 'v10.0'
       metadata: [
         {
           name: 'CURRENT_STACK'

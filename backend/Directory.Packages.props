@@ -1,8 +1,10 @@
 <Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
-    <EfVersion>9.0.21</EfVersion>
-    <AspNetVersion>9.0.21</AspNetVersion>
+    <!-- Pins below also apply to transitive dependencies, so patched versions win over what packages ask for. -->
+    <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
+    <EfVersion>10.0.14</EfVersion>
+    <AspNetVersion>10.0.14</AspNetVersion>
     <HangfireVersion>1.8.25</HangfireVersion>
     <TelerikVersion>19.3.25.1111</TelerikVersion>
   </PropertyGroup>
@@ -21,6 +23,9 @@
     <PackageVersion Include="Hangfire.SqlServer" Version="$(HangfireVersion)" />
     <PackageVersion Include="Hangfire.AspNetCore" Version="$(HangfireVersion)" />
     <PackageVersion Include="Anthropic" Version="13.3.0" />
+    <!-- Security pins for transitive dependencies (Hangfire -> Newtonsoft.Json 11.0.1, SqlClient -> Pkcs 9.0.11 carry advisories). -->
+    <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.2.0" />
     <PackageVersion Include="Scalar.AspNetCore" Version="2.18.0" />
     <PackageVersion Include="Telerik.Reporting$(TelerikPackageSuffix)" Version="$(TelerikVersion)" />
